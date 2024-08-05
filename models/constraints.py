@@ -1,4 +1,4 @@
-from models import db, Rule, Season, Team, Player, Match, MatchSchedule
+from models import db, Rule, Season, Team, Player, Match, MatchSchedule,MatchResult, TeamRanking
 
 def validate_match_schedule(match):
     # Ensure that each team plays only one game per round
