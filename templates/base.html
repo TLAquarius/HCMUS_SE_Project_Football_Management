@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fff; /* White background for the main content area */
+        }
+        .sidebar {
+            background-color: #1c1c1c;
+            height: 100vh;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px;
+            overflow-y: auto;
+        }
+        .sidebar button {
+            margin-bottom: 10px;
+        }
+        .sidebar .btn-link {
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+        .sidebar .btn-link img {
+            width: 50px;
+            height: 50px;
+        }
+        .title-area {
+            background-color: #111; /* Dark color for the title area */
+            color: #fff; /* White text for the title */
+            padding: 10px 20px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 200px; /* Offset to the right of the sidebar */
+            width: calc(100% - 200px);
+            z-index: 1; /* Ensure the title area is above the main content */
+        }
+        .main-content {
+            margin-top: 60px; /* Space for the title area */
+            margin-left: 200px; /* Space for the fixed sidebar */
+            padding: 20px;
+            background-color: #fff; /* White background for the main content */
+            min-height: 100vh; /* Ensure the content area fills the viewport height */
+            overflow-y: auto; /* Allow scrolling if content overflows */
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <button class="btn btn-link text-white" onclick="window.location.href='/'">
+            <img src="/path-to-your-image.png" alt="Home">
+        </button>
+        <button class="btn btn-secondary btn-block">Trang chủ</button>
+        <button class="btn btn-secondary btn-block">Thêm giải</button>
+        <button class="btn btn-secondary btn-block">Xóa giải</button>
+        <button class="btn btn-secondary btn-block">Chỉnh sửa luật giải</button>
+    </div>
+    <div class="title-area">
+        <h1>{% block title %}Default Title{% endblock %}</h1>
+    </div>
+    <div class="main-content">
+        {% block content %}
+        <!-- Content of the page will be inserted here -->
+        {% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

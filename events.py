@@ -1,5 +1,5 @@
 from sqlalchemy import event
-from models import db,Rule, Season, Team, Player, Match, MatchResult, MatchSchedule, TeamRanking
+from models import db,Rule, Season, Team, Player, Match, MatchResult, TeamRanking
 
 # Event listener for after a Player is inserted
 @event.listens_for(Player, 'after_insert')
