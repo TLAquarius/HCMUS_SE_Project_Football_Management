@@ -45,3 +45,20 @@ class TeamRanking(db.Model):
             draw_points = rule.draw_point
             self.total_points = (self.total_wins * win_points) + (self.total_draws * draw_points)
             db.session.commit()
+
+    def update_team_rankings(self):
+        rankings = TeamRanking.query.filter_by(season_id=self.season_id).all()
+
+        # Sort the teams based on ranking criteria
+        rankings.sort(key=lambda r: (
+            r.total_points,
+            r.win_loss_difference,
+            r.total_wins,
+            # Additional head-to-head comparison should be implemented if needed
+        ), reverse=True)
+
+        # Update the rank attribute based on the sorted order
+        for rank, team_ranking in enumerate(rankings, start=1):
+            team_ranking.ranking = rank
+
+        db.session.commit()
