@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Tạo Luật Mới{% endblock %}
+{% block title %}Thêm Luật{% endblock %}
 
 {% block sidebar %}
 <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
@@ -8,60 +8,72 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Tạo Luật Mới</h2>
-    <form action="{{ url_for('rule_change') }}" method="post" enctype="multipart/form-data">
+    <h2 class="mb-4">Thêm Luật</h2>
+    <form action="{{ url_for('rule_change') }}" method="post">
+        <!-- Player Quantity Form -->
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="minimumPlayers">Số lượng cầu thủ tối thiểu</label>
-                <input type="number" class="form-control" id="minimumPlayers" name="minimum_players" min="0" required>
+                <label for="minPlayers">Số lượng cầu thủ (Tối thiểu)</label>
+                <input type="number" class="form-control" id="minPlayers" name="minimum_players" min="0" required>
             </div>
             <div class="form-group col-md-6">
-                <label for="maximumPlayers">Số lượng cầu thủ tối đa</label>
-                <input type="number" class="form-control" id="maximumPlayers" name="maximum_players" min="0" required>
+                <label for="maxPlayers">Số lượng cầu thủ (Tối đa)</label>
+                <input type="number" class="form-control" id="maxPlayers" name="maximum_players" min="0" required>
             </div>
         </div>
+
+        <!-- Player Age Form -->
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="minimumAge">Độ tuổi cầu thủ tối thiểu</label>
-                <input type="number" class="form-control" id="minimumAge" name="minimum_age" min="0" required>
+                <label for="minAge">Độ tuổi cầu thủ (Tối thiểu)</label>
+                <input type="number" class="form-control" id="minAge" name="minimum_age" min="0" required>
             </div>
             <div class="form-group col-md-6">
-                <label for="maximumAge">Độ tuổi cầu thủ tối đa</label>
-                <input type="number" class="form-control" id="maximumAge" name="maximum_age" min="0" required>
+                <label for="maxAge">Độ tuổi cầu thủ (Tối đa)</label>
+                <input type="number" class="form-control" id="maxAge" name="maximum_age" min="0" required>
             </div>
         </div>
+
+        <!-- Foreign Players Form -->
         <div class="form-group">
-            <label for="maximumForeignPlayers">Số lượng cầu thủ nước ngoài tối đa</label>
-            <input type="number" class="form-control" id="maximumForeignPlayers" name="maximum_foreign_players" min="0" required>
+            <label for="maxForeignPlayers">Số lượng cầu thủ nước ngoài tối đa</label>
+            <input type="number" class="form-control" id="maxForeignPlayers" name="maximum_foreign_players" min="0" required>
         </div>
+
+        <!-- Score Types Form -->
         <div class="form-group">
-            <label for="maximumScoreType">Số loại bàn thắng tối đa</label>
-            <input type="number" class="form-control" id="maximumScoreType" name="maximum_score_type" min="0" required>
+            <label for="maxScoreTypes">Số loại bàn thắng</label>
+            <input type="number" class="form-control" id="maxScoreTypes" name="maximum_score_type" min="0" required>
         </div>
+
+        <!-- Match Duration Form -->
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="minimumScoreTime">Thời lượng trận đấu tối thiểu</label>
-                <input type="number" class="form-control" id="minimumScoreTime" name="minimum_score_time" min="0" required>
+                <label for="minMatchDuration">Thời lượng trận đấu (Tối thiểu)</label>
+                <input type="number" class="form-control" id="minMatchDuration" name="minimum_score_time" min="0" required>
             </div>
             <div class="form-group col-md-6">
-                <label for="maximumScoreTime">Thời lượng trận đấu tối đa</label>
-                <input type="number" class="form-control" id="maximumScoreTime" name="maximum_score_time" min="0" required>
+                <label for="maxMatchDuration">Thời lượng trận đấu (Tối đa)</label>
+                <input type="number" class="form-control" id="maxMatchDuration" name="maximum_score_time" min="0" required>
             </div>
         </div>
+
+        <!-- Points Form -->
         <div class="form-row">
             <div class="form-group col-md-4">
-                <label for="winPoint">Điểm thắng</label>
-                <input type="number" class="form-control" id="winPoint" name="win_point" required>
+                <label for="winPoints">Điểm thắng</label>
+                <input type="number" class="form-control" id="winPoints" name="win_point" min="0" required>
             </div>
             <div class="form-group col-md-4">
-                <label for="drawPoint">Điểm hòa</label>
-                <input type="number" class="form-control" id="drawPoint" name="draw_point" required>
+                <label for="drawPoints">Điểm hòa</label>
+                <input type="number" class="form-control" id="drawPoints" name="draw_point" min="0" required>
             </div>
             <div class="form-group col-md-4">
-                <label for="losePoint">Điểm thua</label>
-                <input type="number" class="form-control" id="losePoint" name="lose_point" required>
+                <label for="losePoints">Điểm thua</label>
+                <input type="number" class="form-control" id="losePoints" name="lose_point" min="0" required>
             </div>
         </div>
+
         <button type="submit" class="btn btn-primary">Xác Nhận</button>
     </form>
 </div>
