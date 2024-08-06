@@ -1,5 +1,7 @@
 from flask import render_template, request, redirect, url_for, abort
 from models import db, Rule, Season, Team, Player, Match, MatchResult, TeamRanking
+import os
+from werkzeug.utils import secure_filename
 
 def setup_routes(app):
     @app.route('/')
@@ -21,8 +23,20 @@ def setup_routes(app):
     def add_season():
         if request.method == 'POST':
             season_name = request.form['season_name']
-            new_season = Season(name=season_name)
+            season_note = request.form['note']
+
+            profile_picture = request.files['profile_picture']
+            if profile_picture:
+                profile_picture_filename = secure_filename(profile_picture.filename)
+                profile_picture_path = os.path.join('static/images', profile_picture_filename)
+                profile_picture.save(profile_picture_path)
+            else:
+                profile_picture_filename = None
+
+            new_season = Season(name=season_name, note=season_note, profile_picture='images/' + profile_picture_filename)
+            new_season.update_latest_rule_id()
+
             db.session.add(new_season)
             db.session.commit()
-            return redirect(url_for('home'))
+            return redirect(url_for('view_season', season_id=new_season.id))
         return render_template('add_season.html')
