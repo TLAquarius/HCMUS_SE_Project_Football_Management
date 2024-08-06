@@ -14,3 +14,10 @@ class Rule(db.Model):
     win_point = db.Column(db.Integer, default=3)  # Added point_for_win attribute
     draw_point = db.Column(db.Integer, default=1)
     lose_point = db.Column(db.Integer, default=0)  # Added point_for_lose attribute
+
+    @staticmethod
+    def insert_default_rule():
+        if Rule.query.count() == 0:
+            default_rule = Rule()
+            db.session.add(default_rule)
+            db.session.commit()
