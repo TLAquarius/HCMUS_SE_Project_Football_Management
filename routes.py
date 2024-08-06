@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, abort
-from models import db,Rule, Season, Team, Player, Match, MatchResult, TeamRanking
+from models import db, Rule, Season, Team, Player, Match, MatchResult, TeamRanking
 
 def setup_routes(app):
     @app.route('/')
