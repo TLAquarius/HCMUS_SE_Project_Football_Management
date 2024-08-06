@@ -33,7 +33,7 @@
             height: 50px;
         }
         .title-area {
-            background-color: #111; /* Dark color for the title area */
+            background-color: #333; /* Dark color for the title area */
             color: #fff; /* White text for the title */
             padding: 10px 20px;
             text-align: center;
@@ -58,10 +58,8 @@
         <button class="btn btn-link text-white" onclick="window.location.href='/'">
             <img src="{{ url_for('static', filename='images/Untitled.png') }}" alt="Home">
         </button>
-        <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('home') }}'">Trang chủ</button>
-        <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('add_season') }}'">Thêm giải</button>
-        <button class="btn btn-secondary btn-block">Xóa giải</button>
-        <button class="btn btn-secondary btn-block">Chỉnh sửa luật giải</button>
+        {% block sidebar %}
+        {% endblock %}
     </div>
     <div class="title-area">
         <h1>{% block title %}Default Title{% endblock %}</h1>
