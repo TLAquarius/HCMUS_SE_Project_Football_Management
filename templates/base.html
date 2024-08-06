@@ -56,10 +56,10 @@
 <body>
     <div class="sidebar">
         <button class="btn btn-link text-white" onclick="window.location.href='/'">
-            <img src="/path-to-your-image.png" alt="Home">
+            <img src="{{ url_for('static', filename='images/Untitled.png') }}" alt="Home">
         </button>
-        <button class="btn btn-secondary btn-block">Trang chủ</button>
-        <button class="btn btn-secondary btn-block">Thêm giải</button>
+        <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('home') }}'">Trang chủ</button>
+        <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('add_season') }}'">Thêm giải</button>
         <button class="btn btn-secondary btn-block">Xóa giải</button>
         <button class="btn btn-secondary btn-block">Chỉnh sửa luật giải</button>
     </div>
