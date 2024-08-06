@@ -55,9 +55,9 @@ class TeamRanking(db.Model):
         total_goals = 0
         for match in matches:
             if match.host_team_id == self.team_id:
-                total_goals += match.host_goals
+                total_goals += match.host_score
             if match.guest_team_id == self.team_id:
-                total_goals += match.guest_goals
+                total_goals += match.guest_score
 
         self.total_goals = total_goals
         db.session.commit()

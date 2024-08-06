@@ -1,15 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}Season Details{% endblock %}
+{% block title %}{{ season.name }}{% endblock %}
 
 {% block sidebar %}
     {{ super() }} <!-- Include existing sidebar content from base.html -->
     <!-- Button to trigger the modal -->
+    <button class="btn btn-primary btn-block" onclick="window.location.href='{{ url_for('register_team', season_id=season.id) }}'">Đăng ký tham gia giải</button>
     <button class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Xóa giải</button>
 {% endblock %}
 
 {% block content %}
-<!-- Your existing content for the season details page -->
+<!-- Season Details -->
+<h2 class="mb-4">{{ season.name }}</h2>
+<p><strong>Thông Tin:</strong> {{ season.note }}</p>
+
+<!-- Display Teams -->
+<h3 class="mb-4">Các Đội Bóng</h3>
+<div class="list-group">
+    {% for team in teams %}
+    <a href="#" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ team.name }}</h5>
+            <small>{{ team.stadium }}</small>
+        </div>
+        <img src="{{ url_for('static', filename=team.profile_picture) }}" alt="{{ team.name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+    </a>
+    {% else %}
+    <p>Không có đội bóng nào trong giải đấu này.</p>
+    {% endfor %}
+</div>
 
 <!-- Modal for confirmation -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">

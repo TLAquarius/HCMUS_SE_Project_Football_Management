@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from models import db
 
-
 def create_app(test_config=None):
     app = Flask(__name__)
 
@@ -25,7 +24,6 @@ def create_app(test_config=None):
     setup_routes(app)
 
     return app
-
 
 if __name__ == '__main__':
     app = create_app()

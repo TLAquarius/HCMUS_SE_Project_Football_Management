@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}Đăng Ký Đội Bóng{% endblock %}
+
+{% block sidebar %}
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Trở về giải đấu</button>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Đăng Ký Đội Bóng</h2>
+    <form action="{{ url_for('register_team', season_id=season_id) }}" method="post" enctype="multipart/form-data">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="teamName">Tên Đội Bóng</label>
+                <input type="text" class="form-control" id="teamName" name="team_name" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="teamStadium">Tên Sân Nhà</label>
+                <input type="text" class="form-control" id="teamStadium" name="team_stadium" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="teamLogo">Logo Đội Bóng</label>
+                <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Xác Nhận</button>
+    </form>
+</div>
+{% endblock %}
