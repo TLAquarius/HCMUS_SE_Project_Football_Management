@@ -2,6 +2,12 @@
 
 {% block title %}Quản Lý Giải Vô Địch Bóng Đá Quốc Gia{% endblock %}
 
+{% block sidebar %}
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/add-season'">Thêm giải</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/rule-change'">Chỉnh sửa luật giải</button>
+{% endblock %}
+
 {% block content %}
 <div class="input-group mb-3">
     <input type="text" class="form-control" placeholder="Tìm kiếm" aria-label="Tìm kiếm" aria-describedby="search-button">
@@ -15,7 +21,7 @@
     {% for season in seasons %}
     <button class="list-group-item list-group-item-action season-button" onclick="window.location.href='/season/{{ season.id }}'">
         <div class="btn-icon">
-            <img src="{{ url_for('static', filename= season.profile_picture) }}" alt="{{ season.name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+            <img src="{{ url_for('static', filename=season.profile_picture) }}" alt="{{ season.name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
         </div> {{ season.name }}
     </button>
     {% endfor %}
