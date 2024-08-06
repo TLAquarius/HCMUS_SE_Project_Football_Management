@@ -1,5 +1,6 @@
 from . import db
 from .rule import Rule
+from .match import Match
 
 
 class TeamRanking(db.Model):
@@ -9,6 +10,7 @@ class TeamRanking(db.Model):
     total_draws = db.Column(db.Integer, default=0)
     win_loss_difference = db.Column(db.Integer, default=0)
     total_point = db.Column(db.Integer, default=0)
+    total_goals = db.Column(db.Integer, default=0)
     ranking = db.Column(db.Integer, nullable=False)
     season_id = db.Column(db.Integer, db.ForeignKey('season.id'), nullable=False)
 
@@ -46,6 +48,20 @@ class TeamRanking(db.Model):
             self.total_points = (self.total_wins * win_points) + (self.total_draws * draw_points)
             db.session.commit()
 
+    def update_total_goals(self):
+        # Assuming you have a Match model that tracks goals
+        matches = Match.query.filter((Match.host_team_id == self.team_id)|(Match.guest_team_id == self.team_id)).all()
+
+        total_goals = 0
+        for match in matches:
+            if match.host_team_id == self.team_id:
+                total_goals += match.host_goals
+            if match.guest_team_id == self.team_id:
+                total_goals += match.guest_goals
+
+        self.total_goals = total_goals
+        db.session.commit()
+
     def update_team_rankings(self):
         rankings = TeamRanking.query.filter_by(season_id=self.season_id).all()
 
@@ -53,7 +69,7 @@ class TeamRanking(db.Model):
         rankings.sort(key=lambda r: (
             r.total_points,
             r.win_loss_difference,
-            r.total_wins,
+            r.total_goals,
             # Additional head-to-head comparison should be implemented if needed
         ), reverse=True)
 
