@@ -1,42 +1,15 @@
-<!-- templates/view_season.html -->
 {% extends "base.html" %}
 
+{% block title %}Season Details{% endblock %}
+
+{% block sidebar %}
+    {{ super() }} <!-- Include existing sidebar content from base.html -->
+    <!-- Add the specific sidebar buttons for this page -->
+    <form action="{{ url_for('delete_season', season_id=season.id) }}" method="post">
+        <button type="submit" class="btn btn-danger btn-block">Xóa giải</button>
+    </form>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ season.name }}</h2>
-    <h3>Teams</h3>
-    <ul>
-        {% for team in teams %}
-        <li>{{ team.name }} - Stadium: {{ team.stadium }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Players</h3>
-    <ul>
-        {% for player in players %}
-        <li>{{ player.name }} - Team: {{ player.team.name }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Matches</h3>
-    <ul>
-        {% for match in matches %}
-        <li>{{ match.host_team.name }} vs {{ match.guest_team.name }} - Date: {{ match.match_datetime }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Match Results</h3>
-    <ul>
-        {% for result in match_results %}
-        <li>Match: {{ result.match.id }} - Team: {{ result.team.name }} - Player: {{ result.player.name }} - Score: {{ result.score_type }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Team Rankings</h3>
-    <ul>
-        {% for ranking in team_rankings %}
-        <li>{{ ranking.team.name }} - Wins: {{ ranking.total_wins }} - Losses: {{ ranking.total_losses }} - Draws: {{ ranking.total_draws }} - Ranking: {{ ranking.ranking }}</li>
-        {% endfor %}
-    </ul>
-</div>
+<!-- Your existing content for the season details page -->
 {% endblock %}

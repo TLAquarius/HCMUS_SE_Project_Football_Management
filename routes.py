@@ -40,3 +40,10 @@ def setup_routes(app):
             db.session.commit()
             return redirect(url_for('view_season', season_id=new_season.id))
         return render_template('add_season.html')
+
+    @app.route('/delete-season/<int:season_id>', methods=['POST'])
+    def delete_season(season_id):
+        season = Season.query.get_or_404(season_id)
+        db.session.delete(season)
+        db.session.commit()
+        return redirect(url_for('home'))
