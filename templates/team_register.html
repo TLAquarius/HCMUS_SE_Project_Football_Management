@@ -11,6 +11,8 @@
 <div class="container mt-4">
     <h2 class="mb-4">Đăng Ký Đội Bóng</h2>
     <form action="{{ url_for('register_team', season_id=season_id) }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="season_id" value="{{ season_id }}">
+
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="teamName">Tên Đội Bóng</label>
@@ -25,7 +27,54 @@
                 <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
             </div>
         </div>
+
+        <div id="players-section">
+            <h4>Cầu Thủ</h4>
+            <div class="player-form">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="playerName">Tên Cầu Thủ</label>
+                        <input type="text" class="form-control" name="player_name[]" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="playerType">Loại Cầu Thủ</label>
+                        <select class="form-control" name="player_type[]" required>
+                            <option value="Trong nước">Trong nước</option>
+                            <option value="Nước ngoài">Nước ngoài</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="playerBirthday">Ngày Sinh</label>
+                        <input type="date" class="form-control" name="player_birthday[]" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="playerNote">Ghi Chú</label>
+                        <input type="text" class="form-control" name="player_note[]">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="playerProfilePicture">Ảnh Đại Diện</label>
+                        <input type="file" class="form-control-file" name="player_profile_picture[]">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="addPlayer()">Thêm Cầu Thủ</button>
         <button type="submit" class="btn btn-primary">Xác Nhận</button>
     </form>
 </div>
+
+<script>
+function addPlayer() {
+    var section = document.getElementById('players-section');
+    var newPlayer = document.querySelector('.player-form').cloneNode(true);
+    var inputs = newPlayer.querySelectorAll('input, select');
+    inputs.forEach(function(input) {
+        input.value = '';
+    });
+    section.appendChild(newPlayer);
+}
+</script>
 {% endblock %}

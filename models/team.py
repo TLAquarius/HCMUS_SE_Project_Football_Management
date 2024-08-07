@@ -3,7 +3,7 @@ from .player import Player
 
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
+    name = db.Column(db.String(100), unique=False, nullable=False)
     stadium = db.Column(db.String(100), nullable=False)
     national_players_count = db.Column(db.Integer, default=0)
     foreign_players_count = db.Column(db.Integer, default=0)
