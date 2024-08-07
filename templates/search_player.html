@@ -1,10 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}Tìm Kiếm Cầu Thủ{% endblock %}
+
+{% block sidebar %}
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Trở về giải đấu</button>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Tìm Kiếm Cầu Thủ</h2>
+
+    <!-- Search Bar -->
+    <div class="form-group">
+        <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên cầu thủ để tìm kiếm">
+    </div>
+
+    <!-- Player List -->
+    <div id="playerList" class="list-group">
+        {% for player in players %}
+        <a href="#" class="list-group-item list-group-item-action" onclick="showPlayerInfo('{{ player.id }}', '{{ player.name }}', '{{ player.player_type }}', '{{ player.birthday }}', '{{ player.note }}', '{{ player.profile_picture }}', '{{ player.team_name }}')">
+            {{ player.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Player Info Box -->
+    <div id="playerInfo" class="mt-4">
+        <h4>Thông Tin Cầu Thủ</h4>
+        <div id="playerDetails">
+            <p><strong>Tên Cầu Thủ:</strong> <span id="playerName"></span></p>
+            <p><strong>Loại Cầu Thủ:</strong> <span id="playerType"></span></p>
+            <p><strong>Ngày Sinh:</strong> <span id="playerBirthday"></span></p>
+            <p><strong>Ghi Chú:</strong> <span id="playerNote"></span></p>
+            <p><strong>Đội:</strong> <span id="playerTeam"></span></p>
+            <p><strong>Ảnh Đại Diện:</strong></p>
+            <img id="playerProfilePicture" src="" alt="Player Profile Picture" class="img-fluid">
+        </div>
+    </div>
+</div>
+
+<script>
+    function showPlayerInfo(id, name, playerType, birthday, note, profilePicture, teamName) {
+        document.getElementById('playerName').textContent = name;
+        document.getElementById('playerType').textContent = playerType;
+        document.getElementById('playerBirthday').textContent = birthday;
+        document.getElementById('playerNote').textContent = note;
+        document.getElementById('playerProfilePicture').src = profilePicture;
+        document.getElementById('playerTeam').textContent = teamName;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        var input = this.value.toLowerCase();
+        var items = document.querySelectorAll('#playerList .list-group-item');
+        items.forEach(function(item) {
+            var name = item.textContent.toLowerCase();
+            if (name.includes(input)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

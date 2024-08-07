@@ -36,3 +36,25 @@ def setup_player_routes(app):
 
         teams = Team.query.all()
         return render_template('player_register.html', teams=teams)
+
+    @app.route('/search-player/<int:season_id>', methods=['GET'])
+    def search_player(season_id):
+        players = Player.query.filter_by(season_id=season_id).all()
+
+        # Fetch the team names
+        players_with_team_name = []
+        for player in players:
+            team = Team.query.get(player.team_id)
+            team_name = team.name if team else 'Unknown'
+            player_info = {
+                'id': player.id,
+                'name': player.name,
+                'player_type': player.player_type,
+                'birthday': player.birthday.strftime('%Y-%m-%d') if player.birthday else 'Unknown',
+                'note': player.note,
+                'profile_picture': player.profile_picture,
+                'team_name': team_name
+            }
+            players_with_team_name.append(player_info)
+
+        return render_template('search_player.html', players=players_with_team_name, season_id=season_id)
