@@ -1,10 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}Lập Lịch Thi Đấu{% endblock %}
+
+{% block sidebar %}
+    {{ super() }} <!-- Include existing sidebar content from base.html -->
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season.id) }}'">Trở về giải đấu</button>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Lập Lịch Thi Đấu</h2>
+
+    <!-- Match Schedule Form -->
+    <form action="{{ url_for('match_schedule', season_id=season.id) }}" method="post">
+        <div class="form-group">
+            <label for="round_number">Vòng đấu</label>
+            <input type="number" class="form-control" id="round_number" name="round_number" required>
+        </div>
+
+        <div class="form-group">
+            <label for="match_datetime">Ngày-Giờ</label>
+            <input type="datetime-local" class="form-control" id="match_datetime" name="match_datetime" required>
+        </div>
+
+        <div class="form-group">
+            <label for="host_team_id">Đội chủ nhà</label>
+            <select class="form-control" id="host_team_id" name="host_team_id" required>
+                {% for team in teams %}
+                <option value="{{ team.id }}">{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="guest_team_id">Đội khách</label>
+            <select class="form-control" id="guest_team_id" name="guest_team_id" required>
+                {% for team in teams %}
+                <option value="{{ team.id }}">{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lập Lịch</button>
+    </form>
+</div>
+{% endblock %}

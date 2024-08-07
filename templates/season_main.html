@@ -4,9 +4,9 @@
 
 {% block sidebar %}
     {{ super() }} <!-- Include existing sidebar content from base.html -->
-    <!-- Button to trigger the modal -->
     <button class="btn btn-primary btn-block" onclick="window.location.href='{{ url_for('register_team', season_id=season.id) }}'">Đăng ký tham gia giải</button>
     <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('search_player', season_id=season.id) }}'">Tra cứu cầu thủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('match_schedule', season_id=season.id) }}'">Lập lịch thi đấu</button>
     <button class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Xóa giải</button>
 {% endblock %}
 
@@ -45,7 +45,6 @@
                 Bạn có chắc chắn muốn xóa giải đấu này?
             </div>
             <div class="modal-footer">
-                <!-- Confirmation form -->
                 <form action="{{ url_for('delete_season', season_id=season.id) }}" method="post">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Không xóa</button>
                     <button type="submit" class="btn btn-danger">Xóa</button>
