@@ -35,7 +35,7 @@
             <p><strong>Ghi Chú:</strong> <span id="playerNote"></span></p>
             <p><strong>Đội:</strong> <span id="playerTeam"></span></p>
             <p><strong>Ảnh Đại Diện:</strong></p>
-            <img id="playerProfilePicture" src="" alt="Player Profile Picture" class="img-fluid">
+            <img id="playerProfilePicture" src="" alt="Player Profile Picture" class="img-fluid square-img">
         </div>
     </div>
 </div>
@@ -46,7 +46,11 @@
         document.getElementById('playerType').textContent = playerType;
         document.getElementById('playerBirthday').textContent = birthday;
         document.getElementById('playerNote').textContent = note;
-        document.getElementById('playerProfilePicture').src = profilePicture;
+
+        // Construct the full path for the profile picture
+        var profilePicturePath = '/static/' + profilePicture;
+        document.getElementById('playerProfilePicture').src = profilePicturePath;
+
         document.getElementById('playerTeam').textContent = teamName;
     }
 
@@ -63,4 +67,12 @@
         });
     });
 </script>
+
+<style>
+    .square-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+</style>
 {% endblock %}
