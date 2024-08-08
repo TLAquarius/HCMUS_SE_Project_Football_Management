@@ -6,7 +6,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     # Default configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site3.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['TESTING'] = False
 

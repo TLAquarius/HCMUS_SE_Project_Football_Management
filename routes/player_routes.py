@@ -37,7 +37,7 @@ def setup_player_routes(app):
         teams = Team.query.all()
         return render_template('player_register.html', teams=teams)
 
-    @app.route('/search-player/<int:season_id>', methods=['GET'])
+    @app.route('/season/<int:season_id>/search-player', methods=['GET'])
     def search_player(season_id):
         players = Player.query.filter_by(season_id=season_id).all()
 

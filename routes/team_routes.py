@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 
 def setup_team_routes(app):
-    @app.route('/register-team/<int:season_id>', methods=['GET', 'POST'])
+    @app.route('/season/<int:season_id>/register-team', methods=['GET', 'POST'])
     def register_team(season_id):
         if request.method == 'POST':
             team_name = request.form['team_name']

@@ -9,3 +9,4 @@ from .player import Player
 from .match import Match
 from .match_result import MatchResult
 from .team_ranking import TeamRanking
+from .score_type import  ScoreType
