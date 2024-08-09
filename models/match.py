@@ -13,7 +13,6 @@ class Match(db.Model):
     # Relationship with Teams
     host_team = db.relationship('Team', foreign_keys=[host_team_id],backref=db.backref('home_matches', cascade='all, delete-orphan', lazy=True))
     guest_team = db.relationship('Team', foreign_keys=[guest_team_id],backref=db.backref('away_matches', cascade='all, delete-orphan', lazy=True))
-    results = db.relationship('MatchResult', backref='match', lazy=True)
 
     @property
     def stadium(self):
