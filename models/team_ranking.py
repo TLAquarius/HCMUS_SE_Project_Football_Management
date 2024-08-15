@@ -1,5 +1,4 @@
 from . import db
-from .rule import Rule
 from .match import Match
 
 
@@ -19,6 +18,10 @@ class TeamRanking(db.Model):
     @property
     def team_name(self):
         return self.team.name
+
+    @property
+    def season_id(self):
+        return self.team.season_id
 
     def update_score(self):
         wins_as_host = Match.query.filter(
