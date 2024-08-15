@@ -13,17 +13,7 @@ class Team(db.Model):
     season = db.relationship('Season', backref=db.backref('teams', cascade='all, delete-orphan', lazy=True))
 
     def count_native(self):
-        players = Player.query.filter_by(team_id = self.id).all()
-        native = 0
-        for player in players:
-            if player.player_type == 'native':
-                native += 1
-        return native
+        return Player.query.filter_by(team_id=self.id, player_type="Trong nước").count()
     
     def count_foreign(self):
-        players = Player.query.filter_by(team_id = self.id).all()
-        foreign = 0
-        for player in players:
-            if player.player_type == 'foreign':
-                foreign += 1
-        return foreign
+        return Player.query.filter_by(team_id=self.id, player_type="Nước ngoài").count()

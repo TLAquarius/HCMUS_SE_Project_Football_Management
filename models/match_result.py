@@ -13,8 +13,18 @@ class MatchResult(db.Model):
     player = db.relationship('Player', backref=db.backref('score_events', lazy=True))
     score_type = db.relationship('ScoreType', backref=db.backref('results', lazy=True))
 
-    def get_season_id(self):
+    @property
+    def season_id(self):
         return self.team.season_id
-    
-    def get_score_type(self):
+
+    @property
+    def player_name(self):
+        return self.player.name
+
+    @property
+    def score_type_name(self):
         return self.score_type.name
+
+    @property
+    def team_name(self):
+        return self.team.name
