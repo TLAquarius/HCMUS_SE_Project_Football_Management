@@ -1,5 +1,5 @@
 from . import db
-
+from models import match_result
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,3 +12,11 @@ class Player(db.Model):
     total_score = db.Column(db.Integer, default=0, nullable=False)
 
     team = db.relationship('Team', backref=db.backref('players', cascade='all, delete-orphan', lazy=True))
+    
+    def get_team_name(self):
+        return self.team.name
+    
+    def update_total_score(self):
+        total_score = match_result.MatchResult.query.filter_by(player_id = self.id).count()
+        self.total_score = total_score
+        db.session.commit()

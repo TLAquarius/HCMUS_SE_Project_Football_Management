@@ -1,5 +1,5 @@
 from . import db
-
+from models import match_result
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,3 +17,16 @@ class Match(db.Model):
     @property
     def stadium(self):
         return self.host_team.stadium
+    
+    def update_match_score(self):
+        matches = match_result.MatchResult.query.filter_by(match_id = id).all()
+        host_team_score = 0
+        guest_team_score = 0
+        for results in matches:
+            if results.team_id == self.host_team_id:
+                host_team_score += 1
+            elif results.team_id == self.guest_team_id:
+                guest_team_score += 1
+        self.host_score = host_team_score
+        self.guest_score = guest_team_score
+        db.session.commit()
