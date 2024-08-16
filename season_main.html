@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %} Quản lý giải bóng {{ season.name }}{% endblock %}
+
+{% block sidebar %}
+    {{ super() }} <!-- Include existing sidebar content from base.html -->
+    <button class="btn btn-primary btn-block" onclick="window.location.href='{{ url_for('register_team', season_id=season.id) }}'">Đăng ký tham gia giải</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('match_schedule', season_id=season.id) }}'">Lập lịch trận đấu</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/team_lookup'">Tra cứu đội</button> 
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('search_player', season_id=season.id) }}'">Tra cứu cầu thủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('update_result', season_id=season.id) }}'">Kết quả trận đấu</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/report'">Báo cáo giải</button>
+    <button class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Xóa giải</button>
+{% endblock %}
+
+{% block content %}
+<!-- Content of the page will be inserted here -->
+{% if team_rankings[1] %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Thông tin về giải {{ season.name }}</h5>
+                <p><strong>Thông Tin:</strong> {{ season.note }}</p>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-around">
+                    {% if team_rankings[2] %}
+                    {% for i in [1, 0, 2] %}
+                        {% set team_ranking = team_rankings[i] %}
+                        <!-- Display team -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header text-center">
+                                    <h5 class="card-title">TOP {{ i + 1 }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if team_ranking.team.profile_picture %}
+                                        <img src="{{ url_for('static', filename=team_ranking.team.profile_picture) }}" class="card-img-top" alt="{{ team_ranking.team_name }} Logo">
+                                    {% endif %}
+                                    <p class="card-text text-center" style="font-size: 24px;">{{ team_ranking.team_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                    {% for i in [0, 1] %}
+                        {% set team_ranking = team_rankings[i] %}
+                        <!-- Display team -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header text-center">
+                                    <h5 class="card-title">TOP {{ i + 1 }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if team_ranking.team.profile_picture %}
+                                        <img src="{{ url_for('static', filename=team_ranking.team.profile_picture) }}" class="card-img-top" alt="{{ team_ranking.team_name }} Logo">
+                                    {% endif %}
+                                    <p class="card-text text-center" style="font-size: 24px;">{{ team_ranking.team_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Bảng xếp hạng</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-1">Hạng</th>
+                            <th class="col-6">Đội bóng</th>
+                            <th class="col-2">Điểm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for team_ranking in team_rankings %}
+                            {% if loop.index <= 3 %}
+                            <tr>
+                                <td class="col-1">{{ team_ranking.ranking }}</td>
+                                <td class="col-6">{{ team_ranking.team_name }}</td>
+                                <td class="col-2">{{ team_ranking.total_points }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="#" class="btn btn-primary">Xem thêm</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Kết quả trận đấu</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Trận đấu</th>
+                            <th>Kết quả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matches %}
+                        {% if loop.index <= 3 %}
+                        <tr>
+                            <td>{{ match.host_team.name }} vs {{ match.guest_team.name }}</td>
+                            <td>{{ match.host_score }} - {{ match.guest_score }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ url_for('update_result', season_id=season.id) }}" class="btn btn-primary">Xem thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Tournament not started -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Thông tin về giải {{ season.name }}</h5>
+                <p><strong>Thông Tin:</strong> {{ season.note }}</p>
+            </div>
+            <div class="left">
+                <h3>Giải đấu chưa bắt đầu. Vui lòng chờ thông báo.</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal for confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa giải</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa giải đấu này?
+            </div>
+            <div class="modal-footer">
+                <form action="{{ url_for('delete_season', season_id=season.id) }}" method="post">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không xóa</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
