@@ -1,44 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}Đăng Ký Đội Bóng{% endblock %}
+{% block title %}ĐĂNG KÝ THAM GIA GIẢI{% endblock %}
 
 {% block sidebar %}
-    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
-    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Trở về giải đấu</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Quay lại</button>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Đăng Ký Đội Bóng</h2>
-    <form action="{{ url_for('register_team', season_id=season_id) }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="season_id" value="{{ season_id }}">
-
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="teamName">Tên Đội Bóng</label>
-                <input type="text" class="form-control" id="teamName" name="team_name" required>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="teamStadium">Tên Sân Nhà</label>
-                <input type="text" class="form-control" id="teamStadium" name="team_stadium" required>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="teamLogo">Logo Đội Bóng</label>
-                <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
-            </div>
+    <!-- Part 1: Team Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Thông Tin Đội Bóng
         </div>
+        <div class="card-body">
+            <form id="team-form" action="{{ url_for('register_team', season_id=season_id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="season_id" value="{{ season_id }}">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="teamName">Tên Đội</label>
+                        <input type="text" class="form-control" id="teamName" name="team_name" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="teamStadium">Tên Sân Nhà</label>
+                        <input type="text" class="form-control" id="teamStadium" name="team_stadium" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="teamLogo">Logo Đội Bóng</label>
+                        <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
+                    </div>
+                    <div class="form-group col-md-6 text-center">
+                        <label>Hình Ảnh</label>
+                        <div class="image-preview">
+                            <img id="teamLogoPreview" src="#" alt="Logo Đội Bóng" class="img-thumbnail" style="width: 250px; height: 250px;">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        <div id="players-section">
-            <h4>Cầu Thủ</h4>
+    <!-- Part 2: Player Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Thêm Cầu Thủ
+        </div>
+        <div class="card-body">
             <div class="player-form">
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="playerName">Tên Cầu Thủ</label>
-                        <input type="text" class="form-control" name="player_name[]" required>
+                        <input type="text" class="form-control" id="playerName" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="playerType">Loại Cầu Thủ</label>
-                        <select class="form-control" name="player_type[]" required>
+                        <select class="form-control" id="playerType" required>
                             <option value="Trong nước">Trong nước</option>
                             <option value="Nước ngoài">Nước ngoài</option>
                         </select>
@@ -47,34 +64,161 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="playerBirthday">Ngày Sinh</label>
-                        <input type="date" class="form-control" name="player_birthday[]" required>
+                        <input type="date" class="form-control" id="playerBirthday" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="playerNote">Ghi Chú</label>
-                        <input type="text" class="form-control" name="player_note[]">
+                        <input type="text" class="form-control" id="playerNote">
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="playerProfilePicture">Ảnh Đại Diện</label>
-                        <input type="file" class="form-control-file" name="player_profile_picture[]">
+                    <div class="form-group col-md-6 text-center">
+                        <label>Ảnh Đại Diện</label>
+                        <input type="file" class="form-control-file" id="playerProfilePicture">
+                    </div>
+                    <div class="form-group col-md-6 text-center">
+                        <div class="image-preview">
+                            <img id="playerProfilePicturePreview" src="#" alt="Ảnh Đại Diện" class="img-thumbnail" style="width: 150px; height: 150px;">
+                        </div>
                     </div>
                 </div>
+                <button type="button" class="btn btn-secondary" onclick="addPlayer()">Thêm Cầu Thủ</button>
             </div>
         </div>
+    </div>
 
-        <button type="button" class="btn btn-secondary" onclick="addPlayer()">Thêm Cầu Thủ</button>
-        <button type="submit" class="btn btn-primary">Xác Nhận</button>
-    </form>
+    <button type="button" class="btn btn-secondary" onclick="confirmRegistration()">Xác Nhận Đăng Ký Đội</button>
+    <!-- Players List Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Danh Sách Cầu Thủ Đội
+        </div>
+        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <ul id="playerList" class="list-group">
+                <!-- Players will be dynamically added here -->
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Xác Nhận Đăng Ký</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn đăng ký đội bóng này không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-function addPlayer() {
-    var section = document.getElementById('players-section');
-    var newPlayer = document.querySelector('.player-form').cloneNode(true);
-    var inputs = newPlayer.querySelectorAll('input, select');
-    inputs.forEach(function(input) {
-        input.value = '';
+    // Preview the selected image for team logo
+    document.getElementById('teamLogo').addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('teamLogoPreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     });
-    section.appendChild(newPlayer);
-}
+
+    // Preview the selected image for player profile picture
+    document.getElementById('playerProfilePicture').addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('playerProfilePicturePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function addPlayer() {
+        const playerName = document.getElementById('playerName').value;
+        const playerType = document.getElementById('playerType').value;
+        const playerBirthday = document.getElementById('playerBirthday').value;
+        const playerNote = document.getElementById('playerNote').value;
+        const playerProfilePicture = document.getElementById('playerProfilePicture').files[0];
+
+        if (!playerName || !playerBirthday) {
+            alert('Tên cầu thủ và ngày sinh là bắt buộc.');
+            return;
+        }
+
+        const playerItem = document.createElement('li');
+        playerItem.className = 'list-group-item';
+        playerItem.innerHTML = `
+            <strong>${playerName}</strong> (${playerType}) - ${playerBirthday}<br>
+            Ghi chú: ${playerNote}
+        `;
+
+        if (playerProfilePicture) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '50px';
+                img.style.height = '50px';
+                img.className = 'ml-2 rounded';
+                playerItem.appendChild(img);
+            };
+            reader.readAsDataURL(playerProfilePicture);
+        }
+
+        document.getElementById('playerList').appendChild(playerItem);
+
+        // Add hidden inputs to the form
+        const form = document.getElementById('team-form');
+        form.appendChild(createHiddenInput('player_name[]', playerName));
+        form.appendChild(createHiddenInput('player_type[]', playerType));
+        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday));
+        form.appendChild(createHiddenInput('player_note[]', playerNote));
+
+        if (playerProfilePicture) {
+            const hiddenFileInput = document.createElement('input');
+            hiddenFileInput.type = 'file';
+            hiddenFileInput.name = 'player_profile_picture[]';
+            hiddenFileInput.files = document.getElementById('playerProfilePicture').files;
+            hiddenFileInput.style.display = 'none';
+            form.appendChild(hiddenFileInput);
+        }
+
+        // Reset player form fields
+        document.getElementById('playerName').value = '';
+        document.getElementById('playerType').value = 'Trong nước';
+        document.getElementById('playerBirthday').value = '';
+        document.getElementById('playerNote').value = '';
+        document.getElementById('playerProfilePicture').value = '';
+        document.getElementById('playerProfilePicturePreview').src = '#';
+    }
+
+    function createHiddenInput(name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
+    }
+
+    function confirmRegistration() {
+        $('#confirmationModal').modal('show');
+    }
+
+    function submitForm() {
+        document.getElementById('team-form').submit();
+    }
 </script>
 {% endblock %}

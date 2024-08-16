@@ -56,7 +56,6 @@ def setup_team_routes(app):
                     note=note,
                     profile_picture='images/' + profile_picture_filename if profile_picture_filename else None,
                     team_id=new_team.id,
-                    season_id=season_id  # Associate player with the same season ID
                 )
                 db.session.add(new_player)
 
