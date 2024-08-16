@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for
-from models import db, Team, Player
+from models import db, Team, Player, TeamRanking, Season
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -64,3 +64,16 @@ def setup_team_routes(app):
             return redirect(url_for('view_season', season_id=season_id))
 
         return render_template('team_register.html', season_id=season_id)
+    
+    @app.route('/season/<int:season_id>/rank_team', methods=['GET'])
+    def view_team_rank(season_id):
+        season = Season.query.get_or_404(season_id)
+        teams = Team.query.filter_by(season_id=season_id).all()
+        # Get ranking information for each team
+        team_rankings = []
+        for team in teams:
+            team_ranking = TeamRanking.query.filter_by(team_id=team.id).first()
+            if team_ranking:
+                team_rankings.append(team_ranking)
+        team_rankings.sort(key=lambda x: (x.ranking), reverse=False)
+        return render_template('team_ranking.html', season=season, team_rankings=team_rankings, today=datetime.today().strftime("%d-%m-%Y"))
