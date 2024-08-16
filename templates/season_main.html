@@ -7,7 +7,7 @@
     <button class="btn btn-primary btn-block" onclick="window.location.href='{{ url_for('register_team', season_id=season.id) }}'">Đăng ký tham gia giải</button>
     <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('match_schedule', season_id=season.id) }}'">Lập lịch trận đấu</button>
     <button class="btn btn-secondary btn-block" onclick="window.location.href='/team_lookup'">Tra cứu đội</button> 
-    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('search_player', season_id=season.id) }}'">Tra cứu cầu thủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('search_player', season_id=season.id, player_id = 0) }}'">Tra cứu cầu thủ</button>
     <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('update_result', season_id=season.id) }}'">Kết quả trận đấu</button>
     <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_team_rank', season_id=season.id) }}'">Báo cáo giải</button>
     <button class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Xóa giải</button>
