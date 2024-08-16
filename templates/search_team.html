@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Tra Cứu Đội Tuyển{% endblock %}
+
+{% block sidebar %}
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Tra Cứu Đội Tuyển</h2>
+
+    <!-- Search Bar -->
+    <div class="form-group">
+        <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên đội tuyển để tìm kiếm">
+    </div>
+    <!-- Team List -->
+    <h3 class="mt-4">Danh Sách Đội Tuyển Hiện Có</h3>
+    <ul id="teamList" class="list-group">
+        {% for team in teams %}
+            <a href="#" class=" ">
+                <img src="{{ team.logo }}" class="square-img" alt="{{ team.name }}">
+                {{ team.name }}
+            </a>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+    function showTeamInfo(id, name, logo, description) {
+        document.getElementById('teamName').textContent = name;
+        document.getElementById('teamLogo').src = '/static/' + logo;
+        document.getElementById('teamDescription').textContent = description;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        var input = this.value.toLowerCase();
+        var items = document.querySelectorAll('#team-list li');
+        items.forEach(function(item) {
+            var name = item.querySelector('span').textContent.toLowerCase();
+            if (name.includes(input)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+<style>
+    .square-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
