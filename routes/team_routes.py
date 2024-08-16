@@ -34,7 +34,7 @@ def setup_team_routes(app):
             player_types = request.form.getlist('player_type[]')
             player_birthdays = request.form.getlist('player_birthday[]')
             player_notes = request.form.getlist('player_note[]')
-            player_profile_pictures = request.files.getlist('player_profile_picture[]')
+            player_profile_pictures = request.form.getlist('player_profile_picture[]')
 
             for name, p_type, birthday_str, note, profile_picture in zip(player_names, player_types, player_birthdays, player_notes, player_profile_pictures):
                 try:
@@ -43,9 +43,9 @@ def setup_team_routes(app):
                     birthday = None  # Handle invalid date format if necessary
 
                 if profile_picture:
-                    profile_picture_filename = secure_filename(profile_picture.filename)
-                    profile_picture_path = os.path.join('static/images', profile_picture_filename)
-                    profile_picture.save(profile_picture_path)
+                    profile_picture_filename = secure_filename(profile_picture)
+                    # profile_picture_path = os.path.join('static/images', profile_picture_filename)
+                    # profile_picture.save(profile_picture_path)
                 else:
                     profile_picture_filename = None
 
