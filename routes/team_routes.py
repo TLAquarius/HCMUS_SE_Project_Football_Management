@@ -63,3 +63,8 @@ def setup_team_routes(app):
             return redirect(url_for('view_season', season_id=season_id))
 
         return render_template('team_register.html', season_id=season_id)
+    
+    @app.route('/season/<int:season_id>/search_team', methods=['GET'])
+    def search_team(season_id):
+        teams = Team.query.filter_by(season_id=season_id).all()
+        return render_template('search_team.html', teams=teams, season_id=season_id)
