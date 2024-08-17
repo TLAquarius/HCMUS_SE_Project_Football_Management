@@ -1,9 +1,6 @@
 from . import db
 from .player import Player
 
-from flask_wtf import FlaskForm
-from wtforms import StringField
-from wtforms.validators import DataRequired
 
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,9 +18,3 @@ class Team(db.Model):
     
     def count_foreign(self):
         return Player.query.filter_by(team_id=self.id, player_type="Nước ngoài").count()
-    
-
-class TeamSearchForm(FlaskForm):
-    team_name = StringField("name", validators=[
-        DataRequired()
-    ])

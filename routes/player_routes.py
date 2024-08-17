@@ -4,7 +4,7 @@ import os
 from werkzeug.utils import secure_filename
 
 def setup_player_routes(app):
-    @app.route('/register-player', methods=['GET', 'POST'])
+    @app.route('/register_player', methods=['GET', 'POST'])
     def register_player():
         if request.method == 'POST':
             player_name = request.form['player_name']
@@ -37,7 +37,7 @@ def setup_player_routes(app):
         teams = Team.query.all()
         return render_template('player_register.html', teams=teams)
 
-    @app.route('/season/<int:season_id>/<int:player_id>/search-player', methods=['GET'])
+    @app.route('/season/<int:season_id>/<int:player_id>/search_player', methods=['GET'])
     def search_player(season_id, player_id=None):
         search_term = request.args.get('search')
         if search_term:

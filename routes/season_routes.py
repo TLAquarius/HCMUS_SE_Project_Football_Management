@@ -14,7 +14,7 @@ def setup_season_routes(app):
         match_results = MatchResult.query.filter_by(season_id=season_id).all()
         team_rankings = TeamRanking.query.join(Team).filter(Team.season_id == season_id).order_by(TeamRanking.ranking).all()
         return render_template('season_main.html', season=season, teams=teams, players=players, matches=matches, match_results=match_results, team_rankings=team_rankings)
-    @app.route('/add-season', methods=['GET', 'POST'])
+    @app.route('/add_season', methods=['GET', 'POST'])
     def add_season():
         if request.method == 'POST':
             season_name = request.form['season_name']
@@ -36,7 +36,7 @@ def setup_season_routes(app):
             return redirect(url_for('view_season', season_id=new_season.id))
         return render_template('add_season.html')
 
-    @app.route('/delete-season/<int:season_id>', methods=['POST'])
+    @app.route('/delete_season/<int:season_id>', methods=['POST'])
     def delete_season(season_id):
         season = Season.query.get_or_404(season_id)
         db.session.delete(season)
