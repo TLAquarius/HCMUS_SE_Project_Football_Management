@@ -1,5 +1,6 @@
 from . import db
-from models import Player
+from .player import Player
+
 
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,5 +1,5 @@
 from . import db
-from models import MatchResult
+from .match_result import MatchResult
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)

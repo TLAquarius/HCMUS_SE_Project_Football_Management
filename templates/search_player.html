@@ -1,78 +1,59 @@
 {% extends "base.html" %}
 
-{% block title %}Tìm Kiếm Cầu Thủ{% endblock %}
+{% block title %} Tra cứu cầu thủ {% endblock %}
 
 {% block sidebar %}
-    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
-    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Trở về giải đấu</button>
+{{ super() }}
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
 {% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Tìm Kiếm Cầu Thủ</h2>
-
-    <!-- Search Bar -->
-    <div class="form-group">
-        <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên cầu thủ để tìm kiếm">
-    </div>
-
-    <!-- Player List -->
-    <div id="playerList" class="list-group">
-        {% for player in players %}
-        <a href="#" class="list-group-item list-group-item-action" onclick="showPlayerInfo('{{ player.id }}', '{{ player.name }}', '{{ player.player_type }}', '{{ player.birthday }}', '{{ player.note }}', '{{ player.profile_picture }}', '{{ player.team_name }}')">
-            {{ player.name }}
-        </a>
-        {% endfor %}
-    </div>
-
-    <!-- Player Info Box -->
-    <div id="playerInfo" class="mt-4">
-        <h4>Thông Tin Cầu Thủ</h4>
-        <div id="playerDetails">
-            <p><strong>Tên Cầu Thủ:</strong> <span id="playerName"></span></p>
-            <p><strong>Loại Cầu Thủ:</strong> <span id="playerType"></span></p>
-            <p><strong>Ngày Sinh:</strong> <span id="playerBirthday"></span></p>
-            <p><strong>Ghi Chú:</strong> <span id="playerNote"></span></p>
-            <p><strong>Đội:</strong> <span id="playerTeam"></span></p>
-            <p><strong>Ảnh Đại Diện:</strong></p>
-            <img id="playerProfilePicture" src="" alt="Player Profile Picture" class="img-fluid square-img">
+    <div class="main-content">
+        <form class="form-inline" method="GET">
+            <input type="text" class="form-control mr-sm-2" name="search" placeholder="Nhập tên cầu thủ...">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
+        </form>
+        <div class="player-table">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th style="width: 400px;">Cầu Thủ</th>
+                        <th style="width: 400px;">Đội</th>
+                        <th>Loại Cầu Thủ</th>
+                        <th>Tổng Số Bàn Thắng</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ player.name }}</td>
+                        <td>{{ player.team.name }}</td>
+                        <td>{{ player.player_type }}</td>
+                        <td>{{ player.total_score }}</td>
+                        <td><button class="btn btn-primary" onclick="window.location.href='{{ url_for('search_player', season_id=season_id, player_id=player.id) }}'">Chi tiết</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% if details %}
+        <div class="player-details" id="player-details">
+            <div class="row">
+                <div class="col-md-4">
+                    {% if details.profile_picture %}
+                        <img src="{{ url_for('static', filename=details.profile_picture) }}" class="card-img-top">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h3>{{ details.name }}</h3>
+                    <p><strong>Đội tuyển: {{ details.team.name }}</strong></p>
+                    <p><strong>Loại cầu thủ: {{ details.player_type }}</strong></p>
+                    <p><strong>Ngày sinh: {{ details.birthday }}</strong></p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
-</div>
-
-<script>
-    function showPlayerInfo(id, name, playerType, birthday, note, profilePicture, teamName) {
-        document.getElementById('playerName').textContent = name;
-        document.getElementById('playerType').textContent = playerType;
-        document.getElementById('playerBirthday').textContent = birthday;
-        document.getElementById('playerNote').textContent = note;
-
-        // Construct the full path for the profile picture
-        var profilePicturePath = '/static/' + profilePicture;
-        document.getElementById('playerProfilePicture').src = profilePicturePath;
-
-        document.getElementById('playerTeam').textContent = teamName;
-    }
-
-    document.getElementById('searchInput').addEventListener('input', function() {
-        var input = this.value.toLowerCase();
-        var items = document.querySelectorAll('#playerList .list-group-item');
-        items.forEach(function(item) {
-            var name = item.textContent.toLowerCase();
-            if (name.includes(input)) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    });
-</script>
-
-<style>
-    .square-img {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-    }
-</style>
 {% endblock %}

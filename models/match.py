@@ -1,5 +1,5 @@
 from . import db
-from models import MatchResult
+from .match_result import MatchResult
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
