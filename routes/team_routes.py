@@ -19,7 +19,7 @@ def setup_team_routes(app):
                 profile_picture_path = os.path.join('static/images', profile_picture_filename)
                 profile_picture.save(profile_picture_path)
             else:
-                profile_picture_filename = None
+                profile_picture_filename = 'default_logo.png'
 
             new_team = Team(
                 name=team_name,
@@ -45,10 +45,8 @@ def setup_team_routes(app):
 
                 if profile_picture:
                     profile_picture_filename = secure_filename(profile_picture)
-                    # profile_picture_path = os.path.join('static/images', profile_picture_filename)
-                    # profile_picture.save(profile_picture_path)
                 else:
-                    profile_picture_filename = None
+                    profile_picture_filename = 'default_player.png'
 
                 new_player = Player(
                     name=name,
