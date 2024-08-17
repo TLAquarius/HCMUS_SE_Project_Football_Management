@@ -12,25 +12,32 @@
 
     <!-- Search Bar -->
     <div class="form-group">
-        <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên đội tuyển để tìm kiếm">
+        <form method="GET">
+            <input type="text" name="search" class="form-control" id="searchInput" placeholder="Nhập tên đội tuyển để tìm kiếm">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </form>
     </div>
     <!-- Team List -->
     <h3 class="mt-4">Danh Sách Đội Tuyển Hiện Có</h3>
     <ul id="teamList" class="list-group">
         {% for team in teams %}
-            <a href="#" class=" ">
-                <img src="{{ team.logo }}" class="square-img" alt="{{ team.name }}">
+        <li class="list-group-item" style="background-color: #212529;border-color: #212529;">
+            <a href="#" style="color: #ffffff;justify-content: space-between;">
+                <img src="{{ url_for("static", filename=team.profile_picture) }}" class="square-img" alt="{{ team.name }}" style="width: 50px; height: 50px">
                 {{ team.name }}
             </a>
+        </li>
+        <hr style="margin-top: 1px; margin-bottom: 1px;">
         {% endfor %}
     </ul>
 </div>
 
 <script>
-    function showTeamInfo(id, name, logo, description) {
+    function showTeamInfo(id, name, profilePicture, note) {
         document.getElementById('teamName').textContent = name;
-        document.getElementById('teamLogo').src = '/static/' + logo;
-        document.getElementById('teamDescription').textContent = description;
+        var profilePicturePath = '/static/' + profilePicture;
+        document.getElementById('teamLogo').src = profilePicturePath;
+        document.getElementById('teamDescription').textContent = note;
     }
 
     document.getElementById('searchInput').addEventListener('input', function() {

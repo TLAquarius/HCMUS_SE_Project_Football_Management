@@ -74,6 +74,13 @@ def setup_team_routes(app):
                                maximum_players=rule.maximum_players)
     
     @app.route('/season/<int:season_id>/search_team', methods=['GET'])
-    def search_team(season_id):
-        teams = Team.query.filter_by(season_id=season_id).all()
-        return render_template('search_team.html', teams=teams, season_id=season_id)
+    def search_team(season_id, team_id=None):
+        search_term = request.args.get('search')
+        if search_term:
+            teams = Team.query.filter(Team.name.ilike(f"%{search_term}%")).all()
+        else:
+            teams = Team.query.filter_by(season_id=season_id).all()
+        details=None
+        if team_id:
+            details = Team.query.filter_by(id=team_id).first()
+        return render_template('search_team.html', teams=teams, season_id=season_id, details=details)
