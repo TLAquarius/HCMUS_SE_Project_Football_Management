@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for
-from models import db, Team, Player
+from models import db, Team, Player, Season
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -34,7 +34,7 @@ def setup_team_routes(app):
             player_types = request.form.getlist('player_type[]')
             player_birthdays = request.form.getlist('player_birthday[]')
             player_notes = request.form.getlist('player_note[]')
-            player_profile_pictures = request.files.getlist('player_profile_picture[]')
+            player_profile_pictures = request.form.getlist('player_profile_picture[]')
 
             for name, p_type, birthday_str, note, profile_picture in zip(player_names, player_types, player_birthdays, player_notes, player_profile_pictures):
                 try:
@@ -43,9 +43,9 @@ def setup_team_routes(app):
                     birthday = None  # Handle invalid date format if necessary
 
                 if profile_picture:
-                    profile_picture_filename = secure_filename(profile_picture.filename)
-                    profile_picture_path = os.path.join('static/images', profile_picture_filename)
-                    profile_picture.save(profile_picture_path)
+                    profile_picture_filename = secure_filename(profile_picture)
+                    # profile_picture_path = os.path.join('static/images', profile_picture_filename)
+                    # profile_picture.save(profile_picture_path)
                 else:
                     profile_picture_filename = None
 
@@ -62,7 +62,16 @@ def setup_team_routes(app):
             db.session.commit()
             return redirect(url_for('view_season', season_id=season_id))
 
-        return render_template('team_register.html', season_id=season_id)
+        season = Season.query.get(season_id)
+        rule = season.rule
+
+        return render_template('team_register.html',
+                               season_id=season_id,
+                               max_foreign_players=rule.maximum_foreign_players,
+                               minimum_age=rule.minimum_age,
+                               maximum_age=rule.maximum_age,
+                               minimum_players=rule.minimum_players,
+                               maximum_players=rule.maximum_players)
     
     @app.route('/season/<int:season_id>/search_team', methods=['GET'])
     def search_team(season_id, team_id=None):
