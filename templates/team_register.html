@@ -20,7 +20,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="teamName">Tên Đội</label>
-                        <input type="text" class="form-control" id="teamName" name="team_name" pattern="[A-Za-z\s]+" required>
+                        <input type="text" class="form-control" id="teamName" name="team_name" pattern="[\p{L}\s]+$" required>
                         <div class="invalid-feedback">
                             Tên đội chỉ có thể chứa chữ cái và không được để trống.
                         </div>
@@ -35,6 +35,9 @@
                     <div class="form-group col-md-6">
                         <label for="teamLogo">Nhập logo đội bóng</label>
                         <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
+                        <div class="invalid-feedback">
+                            Logo đội bóng không được để trống.
+                        </div>
                     </div>
                     <div class="form-group col-md-6 text-center">
                         <label>Logo đội bóng</label>
@@ -57,7 +60,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="playerName">Tên Cầu Thủ</label>
-                        <input type="text" class="form-control" id="playerName" required>
+                        <input type="text" class="form-control" id="playerName" pattern="[\p{L}\s]+$" required>
                         <div class="invalid-feedback">
                             Tên cầu thủ chỉ có thể chứa chữ cái và không được để trống.
                         </div>
@@ -162,13 +165,14 @@
    function validateForm() {
         let isValid = true;
 
-        // Validate team information
+        const minPlayers = {{ minimum_players }};
+        const maxPlayers = {{ maximum_players }};
         const teamName = document.getElementById('teamName');
         const teamStadium = document.getElementById('teamStadium');
         const teamProfilePicture = document.getElementById('teamLogo').files[0]; // Assuming the profile picture is uploaded using the 'teamLogo' input field
 
         // Validate team name
-        if (!teamName.value.trim() || !/^[A-Za-z\s]+$/.test(teamName.value.trim())) {
+        if (!teamName.value.trim() || !/^[\p{L}\s]+$/u.test(teamName.value.trim())) {
             teamName.classList.add('is-invalid');
             isValid = false;
         } else {
@@ -195,6 +199,16 @@
         const playerRows = document.querySelectorAll('#playerListTable tbody tr');
         if (playerRows.length === 0) {
             alert('Danh sách cầu thủ không được để trống.');
+            isValid = false;
+        }
+
+        if (playerRows.length > maxPlayers) {
+            alert('Số lượng cầu thủ trong đội vượt quá quy định.');
+            isValid = false;
+        }
+
+        if (playerRows.length < minPlayers && playerRows.length !== 0) {
+            alert('Số lượng cầu thủ trong đội chưa đủ so với quy định.');
             isValid = false;
         }
 
@@ -267,20 +281,53 @@
     });
 
     function addPlayer() {
-        const playerName = document.getElementById('playerName').value;
-        const playerType = document.getElementById('playerType').value;
-        const playerBirthday = document.getElementById('playerBirthday').value;
-        const playerNote = document.getElementById('playerNote').value;
+        const maxForeignPlayers = {{ max_foreign_players }};
+        const minAge = {{ minimum_age }};
+        const maxAge = {{ maximum_age }};
+        const playerName = document.getElementById('playerName');
+        const playerType = document.getElementById('playerType');
+        const playerBirthday = document.getElementById('playerBirthday');
+        const playerNote = document.getElementById('playerNote');
         const playerProfilePicture = document.getElementById('playerProfilePicture').files[0];
 
-        if (!playerName || !playerBirthday) {
-            alert('Tên cầu thủ và ngày sinh là bắt buộc.');
+        if (!playerName.value.trim()||!playerBirthday.value) {
+            if (!playerBirthday.value) {
+                playerBirthday.classList.add('is-invalid');
+            }
+            if (!playerName.value.trim() || !/^[\p{L}\s]+$/u.test(playerName.value.trim())){
+                playerName.classList.add('is-invalid');
+            }
             return;
         }
 
-        const formattedBirthday = new Date(playerBirthday).toLocaleDateString('vi-VN');
+        const currentForeignPlayers = Array.from(document.querySelectorAll('#playerListTable tbody tr td:nth-child(4)')).filter(td => td.textContent.trim() === 'Nước ngoài').length;
 
-        // Default image path if no image is selected
+        if (playerType.value === 'Nước ngoài' && currentForeignPlayers >= maxForeignPlayers) {
+            alert('Số lượng cầu thủ nước ngoài vượt quá quy định.');
+            return;
+        }
+
+        const birthDate = new Date(playerBirthday.value);
+        const today = new Date();
+        var age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+
+        // Adjust age if the birthday hasn't occurred yet this year
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        // Validate age
+        if (age < minAge || age > maxAge) {
+            if (age > minAge){
+                alert('Độ tuổi cầu thủ vượt quá quy định.');
+            }
+            if (age < minAge){
+                alert('Độ tuổi cầu thủ chưa đủ so với quy định.');
+            }
+            return;
+        }
+
+        const formattedBirthday = new Date(playerBirthday.value).toLocaleDateString('vi-VN');
 
         const table = document.getElementById('playerListTable').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow();
@@ -301,9 +348,9 @@
             profileCell.innerHTML = 'N/A';
         }
 
-        nameCell.textContent = playerName;
+        nameCell.textContent = playerName.value;
         birthdayCell.textContent = formattedBirthday;
-        typeCell.textContent = playerType;
+        typeCell.textContent = playerType.value;
 
         const removeButton = document.createElement('button');
         removeButton.className = 'btn btn-danger btn-sm';
@@ -315,19 +362,24 @@
 
         // Add hidden inputs to the form
         const form = document.getElementById('team-form');
-        form.appendChild(createHiddenInput('player_name[]', playerName));
-        form.appendChild(createHiddenInput('player_type[]', playerType));
-        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday));
-        form.appendChild(createHiddenInput('player_note[]', playerNote));
-        form.appendChild(createHiddenInput('player_profile_picture[]', playerProfilePicture.name));
+        form.appendChild(createHiddenInput('player_name[]', playerName.value));
+        form.appendChild(createHiddenInput('player_type[]', playerType.value));
+        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday.value));
+        form.appendChild(createHiddenInput('player_note[]', playerNote.value));
+        if (playerProfilePicture) {
+            form.appendChild(createHiddenInput('player_profile_picture[]', playerProfilePicture.name));
+        } else {
+            form.appendChild(createHiddenInput('player_profile_picture[]', 'default_player.png'));
+        }
+
 
         // Reset player form fields
         document.getElementById('playerName').value = '';
         document.getElementById('playerType').value = 'Trong nước';
         document.getElementById('playerBirthday').value = '';
         document.getElementById('playerNote').value = '';
-        document.getElementById('playerProfilePicture').value = '';
         document.getElementById('playerProfilePicturePreview').src = '#';
+        document.getElementById('playerProfilePicture').value = '';
     }
 
     // Event listeners to remove error classes when the user starts typing or changes the input
