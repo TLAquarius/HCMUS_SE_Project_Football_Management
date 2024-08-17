@@ -1,11 +1,12 @@
 from flask import render_template, request, redirect, url_for
-from models import db, Team, Player, Season
+from models import db, Team, Player, TeamRanking, Season
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
+
 def setup_team_routes(app):
-    @app.route('/season/<int:season_id>/register-team', methods=['GET', 'POST'])
+    @app.route('/season/<int:season_id>/register_team', methods=['GET', 'POST'])
     def register_team(season_id):
         if request.method == 'POST':
             team_name = request.form['team_name']
@@ -72,7 +73,7 @@ def setup_team_routes(app):
                                maximum_age=rule.maximum_age,
                                minimum_players=rule.minimum_players,
                                maximum_players=rule.maximum_players)
-    
+
     @app.route('/season/<int:season_id>/search_team', methods=['GET'])
     def search_team(season_id, team_id=None):
         search_term = request.args.get('search')
@@ -84,3 +85,16 @@ def setup_team_routes(app):
         if team_id:
             details = Team.query.filter_by(id=team_id).first()
         return render_template('search_team.html', teams=teams, season_id=season_id, details=details)
+
+    @app.route('/season/<int:season_id>/rank_team', methods=['GET'])
+    def view_team_rank(season_id):
+        season = Season.query.get_or_404(season_id)
+        teams = Team.query.filter_by(season_id=season_id).all()
+        # Get ranking information for each team
+        team_rankings = []
+        for team in teams:
+            team_ranking = TeamRanking.query.filter_by(team_id=team.id).first()
+            if team_ranking:
+                team_rankings.append(team_ranking)
+        team_rankings.sort(key=lambda x: (x.ranking), reverse=False)
+        return render_template('team_ranking.html', season=season, team_rankings=team_rankings, today=datetime.today().strftime("%d-%m-%Y"))

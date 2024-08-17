@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for
 from models import db, Rule
 
 def setup_rule_routes(app):
-    @app.route('/rule-change', methods=['GET', 'POST'])
+    @app.route('/rule_change', methods=['GET', 'POST'])
     def rule_change():
         if request.method == 'POST':
             # Get data from the form
