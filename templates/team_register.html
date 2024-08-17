@@ -35,14 +35,11 @@
                     <div class="form-group col-md-6">
                         <label for="teamLogo">Nhập logo đội bóng</label>
                         <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
-                        <div class="invalid-feedback">
-                            Logo đội bóng không được để trống.
-                        </div>
                     </div>
                     <div class="form-group col-md-6 text-center">
                         <label>Logo đội bóng</label>
                         <div class="image-preview">
-                            <img id="teamLogoPreview" src="#" alt="Logo Đội Bóng" class="img-thumbnail" style="width: 250px; height: 250px;">
+                            <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Logo đội mặc định" style="width: 150px; height: 150px;" id="teamLogoPreview">
                         </div>
                     </div>
                 </div>
@@ -90,8 +87,9 @@
                         <input type="file" class="form-control-file" id="playerProfilePicture" name="player_profile_picture" required>
                     </div>
                     <div class="form-group col-md-6 text-center">
+                        <label>Ảnh đại diện</label>
                         <div class="image-preview">
-                            <img id="playerProfilePicturePreview" src="#" alt="Ảnh Đại Diện" class="img-thumbnail" style="width: 150px; height: 150px;">
+                            <img src="{{ url_for('static', filename='images/default_player.png') }}" alt="Ảnh đại diện mặc định" style="width: 150px; height: 150px;" id="playerProfilePicturePreview">
                         </div>
                     </div>
                 </div>
@@ -187,14 +185,6 @@
             teamStadium.classList.remove('is-invalid');
         }
 
-        // Validate team profile picture
-        if (!teamProfilePicture) {
-            document.getElementById('teamLogo').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('teamLogo').classList.remove('is-invalid');
-        }
-
         // Validate player information
         const playerRows = document.querySelectorAll('#playerListTable tbody tr');
         if (playerRows.length === 0) {
@@ -230,18 +220,12 @@
         this.classList.remove('is-invalid');
     });
 
-    // Optionally, add an event listener for the profile picture input field
-    document.getElementById('teamLogo').addEventListener('change', function() {
-        this.classList.remove('is-invalid');
-    });
-
     // Event listener for the form submit button
     document.getElementById('team-form').addEventListener('submit', function(event) {
         if (!validateForm()) {
             event.preventDefault();
         }
     });
-
 
     function confirmRegistration() {
         if (!validateForm()) {
@@ -256,27 +240,49 @@
         document.getElementById('team-form').submit();
     }
 
-    // Image preview for team logo
+    document.addEventListener('DOMContentLoaded', function() {
+        const teamLogoPreview = document.getElementById('teamLogoPreview');
+        const defaultLogoPath = "{{ url_for('static', filename='images/default_logo.png') }}";
+
+        // Set the default logo when the page loads
+        teamLogoPreview.src = defaultLogoPath;
+    });
     document.getElementById('teamLogo').addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('teamLogoPreview').src = e.target.result;
+                teamLogoPreview.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        } else {
+            // Revert to the default logo if no file is selected
+            teamLogoPreview.src = defaultLogoPath;
         }
     });
 
-    // Image preview for player profile picture
+    document.addEventListener('DOMContentLoaded', function() {
+        const playerProfilePicturePreview = document.getElementById('playerProfilePicturePreview');
+        const defaultPlayerPicturePath = "{{ url_for('static', filename='images/default_player.png') }}";
+
+        // Set the default player picture when the page loads
+        playerProfilePicturePreview.src = defaultPlayerPicturePath;
+    });
+
     document.getElementById('playerProfilePicture').addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('playerProfilePicturePreview').src = e.target.result;
+                playerProfilePicturePreview.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        } else {
+            const playerProfilePicturePreview = document.getElementById('playerProfilePicturePreview');
+            const defaultPlayerPicturePath = "{{ url_for('static', filename='images/default_player.png') }}";
+
+            // Revert to the default player picture if no file is selected
+            playerProfilePicturePreview.src = defaultPlayerPicturePath;
         }
     });
 
@@ -284,6 +290,7 @@
         const maxForeignPlayers = {{ max_foreign_players }};
         const minAge = {{ minimum_age }};
         const maxAge = {{ maximum_age }};
+        const defaultImagePath = "{{ url_for('static', filename='images/default_player.png') }}";
         const playerName = document.getElementById('playerName');
         const playerType = document.getElementById('playerType');
         const playerBirthday = document.getElementById('playerBirthday');
@@ -378,7 +385,7 @@
         document.getElementById('playerType').value = 'Trong nước';
         document.getElementById('playerBirthday').value = '';
         document.getElementById('playerNote').value = '';
-        document.getElementById('playerProfilePicturePreview').src = '#';
+        document.getElementById('playerProfilePicturePreview').src = defaultImagePath;
         document.getElementById('playerProfilePicture').value = '';
     }
 
