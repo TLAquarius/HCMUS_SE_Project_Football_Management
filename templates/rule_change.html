@@ -9,72 +9,289 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Thêm Luật</h2>
-    <form action="{{ url_for('rule_change') }}" method="post">
-        <!-- Player Quantity Form -->
+    <form id="rule-form" action="{{ url_for('rule_change') }}" method="post" onsubmit="return handleFormSubmission()">
+
+        <!-- Part 1: Team Rules -->
+        <h4>Quy Định Về Đội</h4>
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="minPlayers">Số lượng cầu thủ (Tối thiểu)</label>
-                <input type="number" class="form-control" id="minPlayers" name="minimum_players" min="0" required>
+                <input type="number" class="form-control" id="minPlayers" name="minimum_players" min="0" required value="{{ rule.minimum_players }}">
+                <div class="invalid-feedback">Số lượng cầu thủ (Tối thiểu) không hợp lệ.</div>
             </div>
             <div class="form-group col-md-6">
                 <label for="maxPlayers">Số lượng cầu thủ (Tối đa)</label>
-                <input type="number" class="form-control" id="maxPlayers" name="maximum_players" min="0" required>
+                <input type="number" class="form-control" id="maxPlayers" name="maximum_players" min="0" required value="{{ rule.maximum_players }}">
+                <div class="invalid-feedback">Số lượng cầu thủ (Tối đa) không hợp lệ.</div>
             </div>
         </div>
 
-        <!-- Player Age Form -->
+        <div class="form-group">
+            <label for="maxForeignPlayers">Số lượng cầu thủ nước ngoài tối đa</label>
+            <input type="number" class="form-control" id="maxForeignPlayers" name="maximum_foreign_players" min="0" required value="{{ rule.maximum_foreign_players }}">
+            <div class="invalid-feedback">Số lượng cầu thủ nước ngoài tối đa không hợp lệ.</div>
+        </div>
+
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="minAge">Độ tuổi cầu thủ (Tối thiểu)</label>
-                <input type="number" class="form-control" id="minAge" name="minimum_age" min="0" required>
+                <input type="number" class="form-control" id="minAge" name="minimum_age" min="0" required value="{{ rule.minimum_age }}">
+                <div class="invalid-feedback">Độ tuổi cầu thủ (Tối thiểu) không hợp lệ.</div>
             </div>
             <div class="form-group col-md-6">
                 <label for="maxAge">Độ tuổi cầu thủ (Tối đa)</label>
-                <input type="number" class="form-control" id="maxAge" name="maximum_age" min="0" required>
+                <input type="number" class="form-control" id="maxAge" name="maximum_age" min="0" required value="{{ rule.maximum_age }}">
+                <div class="invalid-feedback">Độ tuổi cầu thủ (Tối đa) không hợp lệ.</div>
             </div>
         </div>
 
-        <!-- Foreign Players Form -->
-        <div class="form-group">
-            <label for="maxForeignPlayers">Số lượng cầu thủ nước ngoài tối đa</label>
-            <input type="number" class="form-control" id="maxForeignPlayers" name="maximum_foreign_players" min="0" required>
-        </div>
-
-        <!-- Score Types Form -->
-        <div class="form-group">
-            <label for="maxScoreTypes">Số loại bàn thắng</label>
-            <input type="number" class="form-control" id="maxScoreTypes" name="maximum_score_type" min="0" required>
-        </div>
-
-        <!-- Match Duration Form -->
+        <!-- Part 2: Match Rules -->
+        <h4>Quy Định Về Trận Đấu</h4>
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="minMatchDuration">Thời lượng trận đấu (Tối thiểu)</label>
-                <input type="number" class="form-control" id="minMatchDuration" name="minimum_score_time" min="0" required>
-            </div>
-            <div class="form-group col-md-6">
                 <label for="maxMatchDuration">Thời lượng trận đấu (Tối đa)</label>
-                <input type="number" class="form-control" id="maxMatchDuration" name="maximum_score_time" min="0" required>
+                <input type="number" class="form-control" id="maxMatchDuration" name="maximum_score_time" min="0" required value="{{ rule.maximum_score_time }}">
+                <div class="invalid-feedback">Thời lượng trận đấu (Tối đa) không hợp lệ.</div>
             </div>
         </div>
 
-        <!-- Points Form -->
         <div class="form-row">
             <div class="form-group col-md-4">
                 <label for="winPoints">Điểm thắng</label>
-                <input type="number" class="form-control" id="winPoints" name="win_point" min="0" required>
+                <input type="number" class="form-control" id="winPoints" name="win_point" min="0" required value="{{ rule.win_point }}">
+                <div class="invalid-feedback">Điểm thắng không hợp lệ.</div>
             </div>
             <div class="form-group col-md-4">
                 <label for="drawPoints">Điểm hòa</label>
-                <input type="number" class="form-control" id="drawPoints" name="draw_point" min="0" required>
+                <input type="number" class="form-control" id="drawPoints" name="draw_point" min="0" required value="{{ rule.draw_point }}">
+                <div class="invalid-feedback">Điểm hòa không hợp lệ.</div>
             </div>
             <div class="form-group col-md-4">
                 <label for="losePoints">Điểm thua</label>
-                <input type="number" class="form-control" id="losePoints" name="lose_point" min="0" required>
+                <input type="number" class="form-control" id="losePoints" name="lose_point" min="0" required value="{{ rule.lose_point }}">
+                <div class="invalid-feedback">Điểm thua không hợp lệ.</div>
             </div>
         </div>
+
+        <!-- Ranking Priority List -->
+        <h5>Thứ Tự Ưu Tiên Xếp Hạng</h5>
+        <div class="ranking-priority">
+            <ul id="priorityList" class="list-group">
+                <!-- List items will be added by JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Hidden Fields for Priorities -->
+        <input type="hidden" id="priority1" name="priority1">
+        <input type="hidden" id="priority2" name="priority2">
+        <input type="hidden" id="priority3" name="priority3">
+        <input type="hidden" id="priority4" name="priority4">
 
         <button type="submit" class="btn btn-primary">Xác Nhận</button>
     </form>
 </div>
+
+<style>
+    .is-invalid {
+        border-color: #dc3545; /* Red border */
+    }
+    .invalid-feedback {
+        display: none;
+        color: #dc3545; /* Red text */
+    }
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const priorities = {
+            1: '{{ rule.priority1|default(0) }}',
+            2: '{{ rule.priority2|default(0) }}',
+            3: '{{ rule.priority3|default(0) }}',
+            4: '{{ rule.priority4|default(0) }}'
+        };
+
+        const categories = [
+            { id: 1, name: 'Điểm Số' },
+            { id: 2, name: 'Bàn Thắng' },
+            { id: 3, name: 'Hiệu Số' },
+            { id: 4, name: 'Đối Kháng' }
+        ];
+
+        function generateListItems(priorities) {
+            const sortedCategories = categories
+                .sort((a, b) => {
+                    const priorityA = Object.keys(priorities).find(key => priorities[key] == a.id);
+                    const priorityB = Object.keys(priorities).find(key => priorities[key] == b.id);
+                    return (priorityA || 0) - (priorityB || 0);
+                });
+
+            sortedCategories.forEach((category, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.innerHTML = `
+                    <span>${index + 1}. ${category.name}</span>
+                    <div>
+                        <button type="button" class="btn btn-secondary btn-sm move-up">↑</button>
+                        <button type="button" class="btn btn-secondary btn-sm move-down">↓</button>
+                    </div>
+                `;
+                document.getElementById('priorityList').appendChild(listItem);
+            });
+
+            attachMoveButtons();
+        }
+
+        function attachMoveButtons() {
+            const items = document.querySelectorAll('#priorityList li');
+            items.forEach(item => {
+                const moveUpButton = item.querySelector('.move-up');
+                const moveDownButton = item.querySelector('.move-down');
+
+                moveUpButton.addEventListener('click', function() {
+                    const prevItem = item.previousElementSibling;
+                    if (prevItem) {
+                        document.getElementById('priorityList').insertBefore(item, prevItem);
+                        updatePriorityNumbers();
+                    }
+                });
+
+                moveDownButton.addEventListener('click', function() {
+                    const nextItem = item.nextElementSibling;
+                    if (nextItem) {
+                        document.getElementById('priorityList').insertBefore(nextItem, item);
+                        updatePriorityNumbers();
+                    }
+                });
+            });
+        }
+
+        function updatePriorityNumbers() {
+            const listItems = document.querySelectorAll('#priorityList li');
+            listItems.forEach((item, index) => {
+                const textSpan = item.querySelector('span');
+                textSpan.textContent = `${index + 1}. ${textSpan.textContent.split('. ')[1]}`;
+            });
+        }
+
+        generateListItems(priorities);
+    });
+
+    function handleFormSubmission() {
+        // Validate the form
+        if (!validateForm()) {
+            return false; // Prevent form submission
+        }
+
+        // Set priority values before submission
+        return setPriorityValues();
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        // Reset previous validation states
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+
+        // Validate player quantity
+        const minPlayers = document.getElementById('minPlayers');
+        const maxPlayers = document.getElementById('maxPlayers');
+        if (parseInt(minPlayers.value) > parseInt(maxPlayers.value)
+        || !minPlayers.value || !maxPlayers.value
+        || minPlayers.value < 0 || maxPlayers.value < 0) {
+            minPlayers.classList.add('is-invalid');
+            maxPlayers.classList.add('is-invalid');
+            alert('Số lượng không được để trống và min<=max');
+            isValid = false;
+        }
+
+        // Validate age
+        const minAge = document.getElementById('minAge');
+        const maxAge = document.getElementById('maxAge');
+        if (parseInt(minAge.value) > parseInt(maxAge.value)
+        || !minAge.value || !maxAge.value
+        || minAge.value < 0 || maxAge.value < 0) {
+            minAge.classList.add('is-invalid');
+            maxAge.classList.add('is-invalid');
+            alert('Tuổi cầu thủ không được để trống và min<=max');
+            isValid = false;
+        }
+
+        // Validate points
+        const winPoints = document.getElementById('winPoints');
+        const drawPoints = document.getElementById('drawPoints');
+        const losePoints = document.getElementById('losePoints');
+        if (parseInt(winPoints.value) <= parseInt(drawPoints.value)
+        || parseInt(drawPoints.value) <= parseInt(losePoints.value)
+        || parseInt(winPoints.value) <= parseInt(losePoints.value)
+        || !winPoints.value || !drawPoints.value || !losePoints.value
+        || winPoints.value < 0 || drawPoints.value < 0 || losePoints.value < 0) {
+            winPoints.classList.add('is-invalid');
+            drawPoints.classList.add('is-invalid');
+            losePoints.classList.add('is-invalid');
+            alert('Điểm phải đẩm bảo thắng>hòa>thua và không được để trống');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            alert('Xin nhập lại các thông tin bị lỗi');
+                    return isValid;
+        }
+
+        if (confirm('Bạn có chắc chắn muốn xác nhận?')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    document.getElementById('minPlayers').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('maxPlayers').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+        document.getElementById('minAge').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('maxAge').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+        document.getElementById('winPoints').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('drawPoints').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+        document.getElementById('losePoints').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+    function setPriorityValues() {
+        const listItems = document.querySelectorAll('#priorityList li span');
+        const priorityMap = {
+            'Điểm Số': 1,
+            'Bàn Thắng': 2,
+            'Hiệu Số': 3,
+            'Đối Kháng': 4
+        };
+
+        listItems.forEach((item, index) => {
+            const categoryName = item.textContent.split('. ')[1].trim();
+            const priorityValue = priorityMap[categoryName];
+            document.getElementById(`priority${index + 1}`).value = priorityValue;
+        });
+
+        return true; // Allow form submission
+    }
+</script>
 {% endblock %}
