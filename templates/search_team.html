@@ -33,13 +33,6 @@
 </div>
 
 <script>
-    function showTeamInfo(id, name, profilePicture, note) {
-        document.getElementById('teamName').textContent = name;
-        var profilePicturePath = '/static/' + profilePicture;
-        document.getElementById('teamLogo').src = profilePicturePath;
-        document.getElementById('teamDescription').textContent = note;
-    }
-
     document.getElementById('searchInput').addEventListener('input', function() {
         var input = this.value.toLowerCase();
         var items = document.querySelectorAll('#team-list li');
