@@ -37,7 +37,7 @@
         </tbody>
     </table>
 
-    <form method="POST" action="/season/{{ season_id }}/save_match">
+    <form method="POST" action="/season/{{ season_id }}/save_match" id="match-form" style="display: none;">
         <div class="form-group">
             <label for="round_number">Vòng đấu</label>
             <input type="number" class="form-control" id="round_number" name="round_number">
@@ -87,6 +87,7 @@ function populateMatchForm(id, round, hostname, guestname, host, guest, stadium,
     document.getElementById('stadium').value = stadium;
     document.getElementById('host_team_id').value = host;
     document.getElementById('guest_team_id').value = guest;
+    document.getElementById("match-form").style.display = "block";
 }
 </script>
 {% endblock %}
