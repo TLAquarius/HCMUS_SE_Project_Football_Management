@@ -36,21 +36,20 @@
             {% endfor %}
         </tbody>
     </table>
-
+    {% if round_error %}
+        <div class="alert alert-danger">{{ round_error }}</div>
+    {% endif %}
+    {% if time_error %}
+    <div class="alert alert-danger">{{ time_error }}</div>
+    {% endif %}
     <form method="POST" action="/season/{{ season_id }}/save_match" id="match-form" style="display: none;">
         <div class="form-group">
             <label for="round_number">Vòng đấu</label>
             <input type="number" class="form-control" id="round_number" name="round_number">
-            {% if round_error %}
-            <div class="alert alert-danger">{{ round_error }}</div>
-            {% endif %}
         </div>
         <div class="form-group">
             <label for="match_datetime">Ngày - Giờ</label>
             <input type="datetime-local" class="form-control" id="match_datetime" name="match_datetime">
-            {% if time_error %}
-            <div class="alert alert-danger">{{ time_error }}</div>
-            {% endif %}
         </div>
         <div class="form-group">
             <label for="host_team">Đội 1 (chủ nhà)</label>

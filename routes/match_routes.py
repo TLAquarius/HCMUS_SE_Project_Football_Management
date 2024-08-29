@@ -50,12 +50,14 @@ def setup_match_routes(app):
         match = Match.query.filter_by(host_team_id=host_team, guest_team_id=guest_team).first()
         if match:
             if match.round_number != round_number:
+                message = ''
+                if round_number<1:
+                    message = 'Vòng đấu không hợp lệ! Hủy bỏ thay đổi.'
                 if Match.query.filter(((Match.host_team_id == host_team) | (Match.guest_team_id == host_team)), Match.round_number == round_number).count() > 0:
                     message = 'Đội nhà đã có trận đấu tại vòng đó! Hủy bỏ thay đổi.'
-                    matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id).order_by(Match.round_number).all()
-                    return render_template('match_schedule.html', season_id=season_id, matches=matches, round_error=message)
                 if Match.query.filter((Match.host_team_id == guest_team) | (Match.guest_team_id == guest_team), Match.round_number == round_number).count() > 0:
                     message = 'Đội khách đã có trận đấu tại vòng đó! Hủy bỏ thay đổi.'
+                if message:
                     matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id).order_by(Match.round_number).all()
                     return render_template('match_schedule.html', season_id=season_id, matches=matches, round_error=message)
                 match.round_number = round_number
