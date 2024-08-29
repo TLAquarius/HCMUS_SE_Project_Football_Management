@@ -76,13 +76,10 @@ def setup_team_routes(app):
     def search_team(season_id, team_id=None):
         search_term = request.args.get('search')
         if search_term:
-            teams = Team.query.filter(Team.name.ilike(f"%{search_term}%")).all()
+            teams = Team.query.filter(Team.season_id==season_id, Team.name.ilike(f"%{search_term}%")).all()
         else:
             teams = Team.query.filter_by(season_id=season_id).all()
-        details=None
-        if team_id:
-            details = Team.query.filter_by(id=team_id).first()
-        return render_template('search_team.html', teams=teams, season_id=season_id, details=details)
+        return render_template('search_team.html', teams=teams, season_id=season_id)
 
     @app.route('/season/<int:season_id>/rank_team', methods=['GET'])
     def view_team_rank(season_id):
