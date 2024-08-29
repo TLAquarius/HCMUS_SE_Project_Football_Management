@@ -40,12 +40,12 @@ def setup_player_routes(app):
     @app.route('/season/<int:season_id>/<int:player_id>/search-player', methods=['GET'])
     def search_player(season_id, player_id=None):
         search_term = request.args.get('search')
-        if search_term:
+        details=None
+        if (search_term is not None) & (search_term != ''):
             players = Player.query.join(Team).filter(Team.season_id==season_id, Player.name.ilike(f"%{search_term}%")).all()
+            details=players[0]
         else:
             players = Player.query.join(Team).filter(Team.season_id==season_id).all()
-        details=None
-        if player_id:
             details = Player.query.join(Team).filter(Team.season_id==season_id, Player.id==player_id).first()
 
         return render_template('search_player.html', players=players, season_id=season_id, details=details)
