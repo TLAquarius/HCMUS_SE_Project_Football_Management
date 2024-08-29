@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for
-from models import db, Season, Team, Player, Match, MatchResult, TeamRanking
+from models import db, Season, Team, Player, Match, MatchResult, TeamRanking, ScoreType
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -26,12 +26,18 @@ def setup_season_routes(app):
                 profile_picture_path = os.path.join('static/images', profile_picture_filename)
                 profile_picture.save(profile_picture_path)
             else:
-                profile_picture_filename = None
+                profile_picture_filename = 'default_season_logo.png'
 
             new_season = Season(name=season_name, note=season_note, profile_picture='images/' + profile_picture_filename)
             new_season.update_latest_rule_id()
 
             db.session.add(new_season)
+            db.session.commit()
+
+            score_types = request.form.getlist('score_types')
+            for score_type in score_types:
+                new_score_type = ScoreType(name=score_type, season_id=new_season.id)
+                db.session.add(new_score_type)
             db.session.commit()
             return redirect(url_for('view_season', season_id=new_season.id))
         return render_template('add_season.html')

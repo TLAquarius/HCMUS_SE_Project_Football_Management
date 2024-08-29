@@ -10,22 +10,94 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Tạo Giải</h2>
-    <form action="{{ url_for('add_season') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url_for('add_season') }}" method="post" enctype="multipart/form-data" id="season-form">
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="seasonName">Tên Giải Đấu</label>
                 <input type="text" class="form-control" id="seasonName" name="season_name" required>
             </div>
             <div class="form-group col-md-6">
+                <div class="image-preview">
+                    <img src="{{ url_for('static', filename='images/default_season_logo.png') }}" alt="Logo giải mặc định" style="width: 150px; height: 150px;" id="seasonLogoPreview">
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
                 <label for="seasonLogo">Logo Giải</label>
-                <input type="file" class="form-control-file" id="seasonLogo" name="profile_picture" required>
+                <input type="file" class="form-control-file" id="seasonLogo" name="profile_picture">
             </div>
         </div>
         <div class="form-group">
             <label for="seasonNote">Thông Tin Giải Đấu</label>
             <textarea class="form-control" id="seasonNote" name="note" rows="4"></textarea>
         </div>
+        <div class="form-group">
+            <label for="scoreType">Loại bàn thắng</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="scoreType">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="addScoreType">Thêm loại bàn thắng</button>
+                </div>
+            </div>
+            <div id="scoreTypeContainer">
+                <!-- Score types will be added here -->
+            </div>
+            <div id="score-type-error" class="text-danger" style="display: none;">Vui lòng thêm ít nhất một loại bàn thắng</div>
+        </div>
         <button type="submit" class="btn btn-primary">Xác Nhận</button>
     </form>
 </div>
+<script>
+    const scoreTypeContainer = document.getElementById('scoreTypeContainer');
+    const addScoreTypeButton = document.getElementById('addScoreType');
+    const scoreTypeInput = document.getElementById('scoreType');
+    const seasonForm = document.getElementById('season-form');
+    const scoreTypeError = document.getElementById('score-type-error');
+    const seasonLogoPreview = document.getElementById('seasonLogoPreview');
+    const defaultLogoPath = "{{ url_for('static', filename='images/default_season_logo.png') }}";
+
+    addScoreTypeButton.addEventListener('click', () => {
+        const scoreType = scoreTypeInput.value.trim();
+        if (scoreType) {
+            const scoreTypeItem = document.createElement('div');
+            scoreTypeItem.className = 'form-check mt-2 d-flex align-items-center';
+            scoreTypeItem.innerHTML = `
+                <input type="hidden" name="score_types" value="${scoreType}">
+                <label class="form-check-label col-6">${scoreType}</label>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeScoreType(this)">Remove</button>
+            `;
+            scoreTypeContainer.appendChild(scoreTypeItem);
+            scoreTypeInput.value = '';
+            scoreTypeError.style.display = 'none';
+        }
+    });
+
+    seasonForm.addEventListener('submit', (e) => {
+        if (scoreTypeContainer.children.length === 0) {
+            e.preventDefault();
+            scoreTypeError.style.display = 'block';
+        }
+    });
+
+    function removeScoreType(button) {
+        button.parentElement.remove();
+        if (scoreTypeContainer.children.length === 0) {
+            scoreTypeError.style.display = 'block';
+        }
+    }
+
+    document.getElementById('seasonLogo').addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                seasonLogoPreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            seasonLogoPreview.src = defaultLogoPath;
+        }
+    });
+</script>
 {% endblock %}
