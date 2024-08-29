@@ -43,7 +43,8 @@ def setup_player_routes(app):
         details=None
         if (search_term is not None) & (search_term != ''):
             players = Player.query.join(Team).filter(Team.season_id==season_id, Player.name.ilike(f"%{search_term}%")).all()
-            details=players[0]
+            if players:
+                details=players[0]
         else:
             players = Player.query.join(Team).filter(Team.season_id==season_id).all()
             details = Player.query.join(Team).filter(Team.season_id==season_id, Player.id==player_id).first()
