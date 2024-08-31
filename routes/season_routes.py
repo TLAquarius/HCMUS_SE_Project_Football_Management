@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from models import db, Season, Team, Player, Match, MatchResult, TeamRanking
 import os
 from werkzeug.utils import secure_filename
@@ -42,3 +42,10 @@ def setup_season_routes(app):
         db.session.delete(season)
         db.session.commit()
         return redirect(url_for('home'))
+    
+    @app.route('/search-seasons', methods=['POST'])
+    def search_seasons():
+        search_value = request.get_json()['search_value']
+        seasons = Season.query.filter(Season.name.like('%' + search_value + '%')).all()
+        data = [{'id': season.id, 'name': season.name, 'profile_picture': season.profile_picture} for season in seasons]
+        return jsonify(data)
