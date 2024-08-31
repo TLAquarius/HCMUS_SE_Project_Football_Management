@@ -5,28 +5,71 @@ from models import db, Team, Match, Season, MatchResult, Player
 def setup_match_routes(app):
     @app.route('/season/<int:season_id>/match_schedule', methods=['GET', 'POST'])
     def match_schedule(season_id):
-        season = Season.query.get_or_404(season_id)
+        matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id).order_by(Match.round_number).all()
+        return render_template('match_schedule.html', season_id=season_id, matches=matches)
+
+    @app.route('/season/<int:season_id>/auto_schedule', methods=['GET'])
+    def auto_schedule(season_id):
         teams = Team.query.filter_by(season_id=season_id).all()
 
-        if request.method == 'POST':
-            round_number = request.form.get('round_number')
-            match_datetime = request.form.get('match_datetime')
-            host_team_id = request.form.get('host_team_id')
-            guest_team_id = request.form.get('guest_team_id')
+        round = 1
+        for i in range(len(teams)-1):
+            if(Match.query.filter((Match.host_team_id == teams[i].id) | (Match.guest_team_id == teams[i].id)).count() == 2*len(teams)-2):
+                continue
+            for j in range(i + 1, len(teams)):
+                if(Match.query.filter((Match.host_team_id == teams[i].id), (Match.guest_team_id == teams[j].id)).count() > 0):
+                    continue
+                match_num = 0
+                while(True):
+                    if(Match.query.filter(Match.round_number==round, 
+                                          ((Match.host_team_id == teams[i].id) | (Match.guest_team_id == teams[j].id) | 
+                                           (Match.host_team_id == teams[j].id) | (Match.guest_team_id == teams[i].id))).count() > 0):
+                        round += 1
+                        continue  
+                    new_match = Match(round_number=round, match_datetime=datetime(2099, 12, 31), host_team_id=teams[i].id, guest_team_id=teams[j].id)
+                    db.session.add(new_match)
+                    match_num+=1
+                    if(match_num<2):
+                        i, j = j, i
+                        continue
+                    i, j = j, i
+                    match_num = 0
+                    round = 1
+                    break
 
-            new_match = Match(
-                round_number=int(round_number),
-                match_datetime=datetime.strptime(match_datetime, '%Y-%m-%dT%H:%M'),
-                host_team_id=int(host_team_id),
-                guest_team_id=int(guest_team_id),
-                season_id=season_id
-            )
+        db.session.commit()
+        return match_schedule(season_id)
 
-            db.session.add(new_match)
+    @app.route('/season/<int:season_id>/save_match', methods=['POST'])
+    def save_match(season_id):
+        match_datetime = request.form['match_datetime']
+        host_team = request.form['host_team_id']
+        guest_team = request.form['guest_team_id']
+        round_number = int(request.form['round_number'])
+        
+        match = Match.query.filter_by(host_team_id=host_team, guest_team_id=guest_team).first()
+        if match:
+            if match.round_number != round_number:
+                message = ''
+                if round_number<1:
+                    message = 'Vòng đấu không hợp lệ! Hủy bỏ thay đổi.'
+                if Match.query.filter(((Match.host_team_id == host_team) | (Match.guest_team_id == host_team)), Match.round_number == round_number).count() > 0:
+                    message = 'Đội nhà đã có trận đấu tại vòng đó! Hủy bỏ thay đổi.'
+                if Match.query.filter((Match.host_team_id == guest_team) | (Match.guest_team_id == guest_team), Match.round_number == round_number).count() > 0:
+                    message = 'Đội khách đã có trận đấu tại vòng đó! Hủy bỏ thay đổi.'
+                if message:
+                    matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id).order_by(Match.round_number).all()
+                    return render_template('match_schedule.html', season_id=season_id, matches=matches, round_error=message)
+                match.round_number = round_number
+
+            try:
+                match.match_datetime = datetime.strptime(match_datetime, '%Y-%m-%dT%H:%M')
+            except ValueError:
+                message = "Ngày tháng không hợp lệ! Hủy bỏ thay đổi."
+                matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id).order_by(Match.round_number).all()
+                return render_template('match_schedule.html', season_id=season_id, matches=matches, time_error=message)
             db.session.commit()
-            return redirect(url_for('view_season', season_id=season_id))
-
-        return render_template('match_schedule.html', season=season, teams=teams)
+        return redirect(url_for('match_schedule', season_id=season_id))
 
     @app.route('/season/<int:season_id>/update_result', methods=['GET', 'POST'])
     def update_result(season_id):

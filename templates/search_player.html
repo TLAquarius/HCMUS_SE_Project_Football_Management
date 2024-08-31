@@ -26,31 +26,35 @@
                 </thead>
                 <tbody>
                     {% for player in players %}
-                    <tr>
+                    <tr onclick="window.location.href='{{ url_for('search_player', season_id=season_id, player_id=player.id) }}'">
                         <td>{{ loop.index }}</td>
                         <td>{{ player.name }}</td>
                         <td>{{ player.team.name }}</td>
                         <td>{{ player.player_type }}</td>
                         <td>{{ player.total_score }}</td>
-                        <td><button class="btn btn-primary" onclick="window.location.href='{{ url_for('search_player', season_id=season_id, player_id=player.id) }}'">Chi tiết</button></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% if details %}
-        <div class="player-details" id="player-details">
-            <div class="row">
-                <div class="col-md-4">
-                    {% if details.profile_picture %}
-                        <img src="{{ url_for('static', filename=details.profile_picture) }}" class="card-img-top">
-                    {% endif %}
-                </div>
-                <div class="col-md-8">
-                    <h3>{{ details.name }}</h3>
-                    <p><strong>Đội tuyển: {{ details.team.name }}</strong></p>
-                    <p><strong>Loại cầu thủ: {{ details.player_type }}</strong></p>
-                    <p><strong>Ngày sinh: {{ details.birthday }}</strong></p>
+        <div class="card-header">
+            Thông tin cầu thủ
+        </div>
+        <div class="card-body">
+            <div class="player-details" id="player-details">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if details.profile_picture %}
+                            <img src="{{ url_for('static', filename=details.profile_picture) }}" class="card-img-top">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h3>{{ details.name }}</h3>
+                        <p><strong>Đội tuyển: {{ details.team.name }}</strong></p>
+                        <p><strong>Loại cầu thủ: {{ details.player_type }}</strong></p>
+                        <p><strong>Ngày sinh: {{ details.birthday }}</strong></p>
+                    </div>
                 </div>
             </div>
         </div>
