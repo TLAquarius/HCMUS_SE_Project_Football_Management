@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Xóa Giải{% endblock %}
+
+{% block sidebar %}
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+{% endblock %}
+
+{% block content %}
+<form id="delete-form" method="POST" action="/delete_seasons">
+    <div class="list-group">
+        {% for season in seasons %}
+        <label class="list-group-item list-group-item-action season-button">
+            <input type="checkbox" name="season_ids" value="{{ season.id }}" style="margin-right: 10px;">
+            <img src="{{ url_for('static', filename=season.profile_picture) }}" alt="{{ season.name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+            {{ season.name }}
+        </label>
+        {% endfor %}
+    </div>
+    <button id="delete-button" class="btn btn-danger btn-block mt-3">Xóa giải</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('delete-button').addEventListener('click', function() {
+    // Ensure that the form is submitted properly
+    if (confirm('Bạn có chắc chắn muốn xóa các giải đã chọn?')) {
+        document.getElementById('delete-form').submit();
+    }
+    });
+
+    const seasonButtons = document.querySelectorAll('.season-button');
+    seasonButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const checkbox = button.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+    });
+    });
+</script>
+{% endblock %}
