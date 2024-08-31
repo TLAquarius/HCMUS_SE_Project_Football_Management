@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý giải bóng {{ season.name }}{% endblock %}
+
+{% block sidebar %}
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Quay lại</button>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Thông tin đội {{ team.name }}
+        <button style="float: right; margin-right: 20px; font-size: 20px;">Chỉnh sửa thông tin</button>
+    </h2>
+    <div class="team-info" style="background-color: #000; padding: 20px; border-radius: 10px; color: #fff;">
+        <h3>Đội {{ team.name }}</h3>
+        <div style="display: flex; align-items: center;">
+            <div class="team-logo">
+                <img src= "{{ url_for('static', filename=team.profile_picture) }}" class="square-img" alt="{{ team.name }}" style="width: 200px; height: 200px">
+            </div>
+            <table style="margin-left: 20px;">
+                <tr>
+                  <th scope="row">Sân nhà: <br> Thứ hạng hiện tại: </th>
+                  <td style="padding-left: 20px;">{{ team.stadium }} <br> {{ team_ranking.ranking }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="player-table" style="margin-top: 10px;">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th style="width: 300px;">Cầu Thủ</th>
+                    <th>Ngày Sinh</th>
+                    <th>Loại Cầu Thủ</th>
+                    <th style="width: 400px;">Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ player.name }}</td>
+                    <td>{{ player.birthday }}</td>
+                    <td>{{ player.player_type }}</td>
+                    <td>{{ player.note }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>
+    .table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+    }
+</style>
+{% endblock %}
