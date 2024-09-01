@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash
 from datetime import datetime
-from models import db, Team, Match, Season, MatchResult, Player
+from models import db, Team, Match, Season, MatchResult, Player, ScoreType, TeamRanking
 
 def setup_match_routes(app):
     @app.route('/season/<int:season_id>/match_schedule', methods=['GET', 'POST'])
@@ -74,44 +74,111 @@ def setup_match_routes(app):
     @app.route('/season/<int:season_id>/update_result', methods=['GET', 'POST'])
     def update_result(season_id):
         if request.method == 'POST':
-            match_id = request.form['match_id']
-            host_score = request.form['host_score']
-            guest_score = request.form['guest_score']
+            # Get the match_id from the form
+            match_id = request.form.get('match_id')
 
-            match = Match.query.get(match_id)
-            if not match:
-                return redirect(url_for('update_result', season_id=season_id))
-
-            # Update match scores
-            match.host_score = host_score
-            match.guest_score = guest_score
-
-            # Delete old results
+            # Step 1: Delete existing results for the given match_id
             MatchResult.query.filter_by(match_id=match_id).delete()
-
-            # Add new results
-            for key, value in request.form.items():
-                if key.startswith('player_id_'):
-                    row_index = key.split('_')[2]
-                    player_id = value
-                    score_type = request.form.get(f'score_type_{row_index}')
-                    score_time = request.form.get(f'score_time_{row_index}')
-                    if player_id and score_type and score_time:
-                        result = MatchResult(
-                            match_id=match_id,
-                            team_id=Team.query.filter(Team.players.any(id=player_id)).first().id,
-                            player_id=player_id,
-                            score_time=score_time,
-                            score_type=score_type,
-                            season_id=season_id
-                        )
-                        db.session.add(result)
-
             db.session.commit()
-            return redirect(url_for('update_result', season_id=season_id))
 
-        # GET request: Render the page with matches and players
-        matches = Match.query.filter_by(season_id=season_id).all()
-        players = Player.query.all()
+            # Step 2: Collect new results from the form
+            i = 0
+            results = []
+            teams_that_scored = set()
+            while True:
+                score_time = request.form.get(f'result[{i}][score_time]')
+                team_id = request.form.get(f'result[{i}][team_id]')
+                player_id = request.form.get(f'result[{i}][player_id]')
+                score_type_id = request.form.get(f'result[{i}][score_type_id]')
 
-        return render_template('update_result.html', matches=matches, players=players, season_id=season_id)
+                if score_time is None or team_id is None or player_id is None or score_type_id is None:
+                # No more results
+                    break
+
+                # Create a new Result object and add it to the database
+                new_result = MatchResult(
+                    match_id=match_id,
+                    score_time=score_time,
+                    team_id=team_id,
+                    player_id=player_id,
+                    score_type_id=score_type_id
+                )
+                db.session.add(new_result)
+
+                teams_that_scored.add(team_id)
+
+                result = {
+                    'match_id': match_id,
+                    'score_time': score_time,
+                    'team_id': team_id,
+                    'player_id': player_id,
+                    'score_type_id': score_type_id
+                }
+                results.append(result)
+                i += 1
+
+            # Commit the new results to the database
+            db.session.commit()
+
+            # Step 3: Update match scores
+            match = Match.query.get(match_id)
+            if match:
+                match.update_match_score()
+
+            # Step 4: Update players' total scores
+            player_ids_with_scores = {result['player_id'] for result in results}
+            for player_id in player_ids_with_scores:
+                player = Player.query.get(player_id)
+                if player:
+                    player.update_total_score()
+
+            team_ids = db.session.query(Team.id).filter_by(season_id=season_id).all()
+            for team_id in team_ids:
+                team_ranking = TeamRanking.query.get(team_id[0])
+                if not team_ranking:
+                    TeamRanking.insert_default_value(team_id[0])
+
+            # Step 5: Update team rankings
+            for team_id in teams_that_scored:
+                team_ranking = TeamRanking.query.get(team_id)
+                if team_ranking:
+                    team_ranking.update_score()
+                    team_ranking.update_total_goals()
+                    team_ranking.update_points()
+            TeamRanking.update_rankings(season_id)
+
+
+        # GET request to fetch match details and results
+
+        # Handle the main page with match search/filter options
+        team_name = request.args.get('team_name')
+        round_number = request.args.get('round_number')
+        match_date = request.args.get('match_date')
+
+        matches_query = Match.query.join(Team, Match.host_team_id == Team.id) \
+            .filter(Team.season_id == season_id)
+
+        if team_name:
+            matches_query = matches_query.filter(
+                Team.name.ilike(f'%{team_name}%') |
+                Match.guest_team.has(Team.name.ilike(f'%{team_name}%'))
+            )
+
+        if round_number:
+            matches_query = matches_query.filter(Match.round_number == round_number)
+
+        if match_date:
+            matches_query = matches_query.filter(db.func.date(Match.match_datetime) == match_date)
+
+        matches = matches_query.all()
+        score_types = ScoreType.query.filter_by(season_id=season_id).all()
+        match_ids = [match.id for match in matches]
+        results = MatchResult.query.filter(MatchResult.match_id.in_(match_ids)).all()
+
+        players = Player.query.filter(Player.team_id.in_(
+            [team.id for team in Team.query.filter_by(season_id=season_id).all()]
+        )).all()
+        season = Season.query.get(season_id)
+        rule = season.rule
+
+        return render_template('update_result.html', matches=matches, players=players, season_id=season_id,results=results,score_types=score_types,maximum_score_time=rule.maximum_score_time)
