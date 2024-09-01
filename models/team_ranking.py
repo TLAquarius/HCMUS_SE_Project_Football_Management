@@ -101,43 +101,75 @@ class TeamRanking(db.Model):
         db.session.commit()
 
     @classmethod
-    def update_rankings(cls,season_id):
-
+    def update_rankings(cls, season_id):
+        # Retrieve the rule for the specific season
         season = Season.query.get(season_id)
         rule = season.rule
 
         # Retrieve all team rankings for the specific season
         team_rankings = TeamRanking.query.join(Team).filter(Team.season_id == season_id).all()
 
+        # Define a function to get head-to-head comparison between two teams
+        def head_to_head_comparison(team_ranking_a, team_ranking_b):
+            # Find matches where these two teams played against each other
+            matches = Match.query.filter(
+                ((Match.host_team_id == team_ranking_a.team_id) & (Match.guest_team_id == team_ranking_b.team_id)) |
+                ((Match.host_team_id == team_ranking_b.team_id) & (Match.guest_team_id == team_ranking_a.team_id))
+            ).all()
+
+            # Count wins for both teams in head-to-head matches
+            wins_a = sum(1 for match in matches if
+                         (match.host_team_id == team_ranking_a.team_id and match.host_score > match.guest_score) or
+                         (match.guest_team_id == team_ranking_a.team_id and match.guest_score > match.host_score))
+
+            wins_b = sum(1 for match in matches if
+                         (match.host_team_id == team_ranking_b.team_id and match.host_score > match.guest_score) or
+                         (match.guest_team_id == team_ranking_b.team_id and match.guest_score > match.host_score))
+
+            if wins_a != wins_b:
+                return wins_a - wins_b  # Return the difference in wins
+
+            # If the number of wins is equal, compare total goals in head-to-head matches
+            total_goals_a = sum(match.host_score for match in matches if match.host_team_id == team_ranking_a.team_id) + \
+                            sum(match.guest_score for match in matches if match.guest_team_id == team_ranking_a.team_id)
+
+            total_goals_b = sum(match.host_score for match in matches if match.host_team_id == team_ranking_b.team_id) + \
+                            sum(match.guest_score for match in matches if match.guest_team_id == team_ranking_b.team_id)
+
+            return total_goals_a - total_goals_b  # Return the difference in goals
+
         # Define a function to get the sorting key based on priority
         def get_sorting_key(team_ranking):
-            total_points = team_ranking.total_points
-            win_loss_difference = team_ranking.win_loss_difference
-            total_goals = team_ranking.total_goals
-            total_wins = team_ranking.total_wins
-
-            # Map priority to values
-            priorities = {
-                1: total_points,
-                2: win_loss_difference,
-                3: total_goals,
-                4: total_wins
-            }
-
-            # Get the priority values from the rule
+            # Extract priority values
             p1 = rule.priority1
             p2 = rule.priority2
             p3 = rule.priority3
             p4 = rule.priority4
 
-            # Return a tuple where higher priorities come first
-            return (-priorities.get(p1, 0),  # Use negative values for descending order
-                    -priorities.get(p2, 0),
-                    -priorities.get(p3, 0),
-                    -priorities.get(p4, 0))
+            # Define priorities mapping
+            priorities = {
+                1: team_ranking.total_points,
+                2: team_ranking.win_loss_difference,
+                3: team_ranking.total_goals,
+                4: lambda tr: head_to_head_comparison(team_ranking, tr)  # Lambda for head-to-head comparison
+            }
+
+            # Generate a sorting tuple based on priority order
+            def priority_value(p):
+                # If the priority is a callable (lambda function), execute it
+                if callable(priorities.get(p)):
+                    return -priorities.get(p)(team_ranking)  # Use negative for descending order
+                return -priorities.get(p, 0)  # Use negative for descending order if it's a value
+
+            return (
+                priority_value(p1),
+                priority_value(p2),
+                priority_value(p3),
+                priority_value(p4)
+            )
 
         # Sort team rankings using the custom key function
-        team_rankings.sort(key=get_sorting_key)
+        team_rankings.sort(key=lambda tr: get_sorting_key(tr))
 
         # Update rankings
         for index, team_ranking in enumerate(team_rankings):
