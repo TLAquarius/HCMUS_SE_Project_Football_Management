@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from models import db, Team, Player, TeamRanking, Season
 import os
 from werkzeug.utils import secure_filename
@@ -73,13 +73,14 @@ def setup_team_routes(app):
                                maximum_players=rule.maximum_players)
 
     @app.route('/season/<int:season_id>/search_team', methods=['GET'])
-    def search_team(season_id, team_id=None):
+    def search_team(season_id):
+        season = Season.query.get_or_404(season_id)
         search_term = request.args.get('search')
         if search_term:
             teams = Team.query.filter(Team.season_id==season_id, Team.name.ilike(f"%{search_term}%")).all()
         else:
             teams = Team.query.filter_by(season_id=season_id).all()
-        return render_template('search_team.html', teams=teams, season_id=season_id)
+        return render_template('search_team.html', teams=teams, season=season)
 
     @app.route('/season/<int:season_id>/rank_team', methods=['GET'])
     def view_team_rank(season_id):
@@ -93,3 +94,21 @@ def setup_team_routes(app):
                 team_rankings.append(team_ranking)
         team_rankings.sort(key=lambda x: (x.ranking), reverse=False)
         return render_template('team_ranking.html', season=season, team_rankings=team_rankings, today=datetime.today().strftime("%d-%m-%Y"))
+    
+    @app.route('/season/<int:season_id>/team/<int:team_id>/view_team', methods=['GET'])
+    def view_team(season_id, team_id):
+        season = Season.query.get_or_404(season_id)
+        team = Team.query.get_or_404(team_id)
+        team_ranking = TeamRanking.query.filter_by(team_id=team_id).first()
+        players = Player.query.filter_by(team_id=team_id).all()
+        return render_template('view_team.html', players=players, team=team, team_ranking=team_ranking, season=season)
+    
+    @app.route('/update_team/<int:team_id>', methods=['POST'])
+    def update_team(team_id):
+        team_name = request.json['team_name']
+        team_stadium = request.json['team_stadium']
+        team = Team.query.get(team_id)
+        team.name = team_name
+        team.stadium = team_stadium
+        db.session.commit()
+        return jsonify({'message': 'Team information updated successfully'})
