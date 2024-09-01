@@ -26,7 +26,7 @@ def setup_season_routes(app):
                 profile_picture_path = os.path.join('static/images', profile_picture_filename)
                 profile_picture.save(profile_picture_path)
             else:
-                profile_picture_filename = 'default_season_logo.png'
+                profile_picture_filename = 'default_season_logo.jpg'
 
             new_season = Season(name=season_name, note=season_note, profile_picture='images/' + profile_picture_filename)
             new_season.update_latest_rule_id()
