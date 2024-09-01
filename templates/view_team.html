@@ -4,13 +4,13 @@
 
 {% block sidebar %}
     <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
-    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Quay lại</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season.id) }}'">Quay lại</button>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Thông tin đội {{ team.name }}
-        <button style="float: right; margin-right: 20px; font-size: 20px;">Chỉnh sửa thông tin</button>
+        <button id="edit-button" style="float: right; margin-right: 20px; font-size: 20px;">Chỉnh sửa thông tin</button>
     </h2>
     <div class="team-info" style="background-color: #000; padding: 20px; border-radius: 10px; color: #fff;">
         <h3>Đội {{ team.name }}</h3>
@@ -20,12 +20,24 @@
             </div>
             <table style="margin-left: 20px;">
                 <tr>
-                  <th scope="row">Sân nhà: <br> Thứ hạng hiện tại: </th>
-                  <td style="padding-left: 20px;">{{ team.stadium }} <br> {{ team_ranking.ranking }}</td>
+                    <th scope="row">Sân nhà: <br> Thứ hạng hiện tại: </th>
+                    <td style="padding-left: 20px;">{{ team.stadium }} <br> {{ team_ranking.ranking }}</td>
                 </tr>
             </table>
         </div>
     </div>
+    <!-- Add a hidden form to edit team information -->
+    <div id="edit-form" style="display: none;">
+        <form>
+            <label for="name">Tên đội:</label>
+            <input type="text" id="team_name" value="{{ team.name }}"><br><br>
+            <label for="stadium">Sân nhà:</label>
+            <input type="text" id="team_stadium" value="{{ team.stadium }}"><br><br>
+            <input type="hidden" id="team_id" name="team_id" value="{{ team.id }}">
+            <button id="submit-button">Lưu thay đổi</button>
+        </form>
+    </div>
+
     <div class="player-table" style="margin-top: 10px;">
         <table class="table table-bordered">
             <thead>
@@ -51,6 +63,38 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.getElementById("edit-button").addEventListener("click", function() {
+        document.getElementById("edit-form").style.display = "block";
+    });
+
+    document.getElementById("submit-button").addEventListener("click", function(event) {
+        var teamName = document.getElementById("team_name").value;
+        var teamStadium = document.getElementById("team_stadium").value;
+        const teamId = document.getElementById("team_id").value;
+        // Send a POST request to the server to update the team information
+        fetch('/update_team/' + teamId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                team_name: teamName,
+                team_stadium: teamStadium
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            document.getElementById("team_name").innerHTML = "Đội " + teamName;
+            document.getElementById("team_stadium").innerHTML = teamStadium + " <br> {{ team_ranking.ranking }}";
+            document.getElementById("edit-form").style.display = "none";
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
 <style>
     .table-striped tbody tr:nth-child(odd) {
     background-color: #f9f9f9;

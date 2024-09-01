@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from models import db, Team, Player, TeamRanking, Season
 import os
 from werkzeug.utils import secure_filename
@@ -102,3 +102,13 @@ def setup_team_routes(app):
         team_ranking = TeamRanking.query.filter_by(team_id=team_id).first()
         players = Player.query.filter_by(team_id=team_id).all()
         return render_template('view_team.html', players=players, team=team, team_ranking=team_ranking, season=season)
+    
+    @app.route('/update_team/<int:team_id>', methods=['POST'])
+    def update_team(team_id):
+        team_name = request.json['team_name']
+        team_stadium = request.json['team_stadium']
+        team = Team.query.get(team_id)
+        team.name = team_name
+        team.stadium = team_stadium
+        db.session.commit()
+        return jsonify({'message': 'Team information updated successfully'})
