@@ -5,19 +5,15 @@
 {% block sidebar %}
 <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
 <button class="btn btn-secondary btn-block" onclick="window.location.href='/add_season'">Thêm giải</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/delete_seasons'">Xóa giải</button>
 <button class="btn btn-secondary btn-block" onclick="window.location.href='/rule_change'">Chỉnh sửa luật giải</button>
 {% endblock %}
 
 {% block content %}
 <div class="input-group mb-3">
-    <input type="text" class="form-control" placeholder="Tìm kiếm" aria-label="Tìm kiếm" aria-describedby="search-button">
-    <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" id="search-button">
-            <span class="glyphicon glyphicon-search"></span>
-        </button>
-    </div>
+    <input type="text" class="form-control" placeholder="Tìm kiếm" aria-label="Tìm kiếm" aria-describedby="search-button" id="search-input">
 </div>
-<div class="list-group">
+<div class="list-group" id="season-list">
     {% for season in seasons %}
     <button class="list-group-item list-group-item-action season-button" onclick="window.location.href='/season/{{ season.id }}'">
         <div class="btn-icon">
@@ -26,4 +22,51 @@
     </button>
     {% endfor %}
 </div>
+
+<script>
+    document.getElementById('search-input').addEventListener('input', function() {
+        filterSeasons();
+    });
+
+    function filterSeasons() {
+        var searchInput = document.getElementById('search-input');
+        var searchValue = searchInput.value;
+
+        fetch('/search-seasons', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({search_value: searchValue})
+        })
+        .then(response => response.json())
+        .then(data => {
+            var seasonList = document.getElementById('season-list');
+            seasonList.innerHTML = '';
+
+            data.forEach(season => {
+                var seasonButton = document.createElement('button');
+                seasonButton.classList.add('list-group-item', 'list-group-item-action', 'season-button');
+                seasonButton.onclick = function() {
+                    window.location.href = '/season/' + season.id;
+                };
+
+                var btnIcon = document.createElement('div');
+                btnIcon.classList.add('btn-icon');
+                var img = document.createElement('img');
+                img.src = '/static/' + season.profile_picture;
+                img.alt = season.name;
+                img.classList.add('img-fluid', 'rounded-circle');
+                img.style.width = '40px';
+                img.style.height = '40px';
+                btnIcon.appendChild(img);
+
+                seasonButton.appendChild(btnIcon);
+                seasonButton.appendChild(document.createTextNode(season.name));
+
+                seasonList.appendChild(seasonButton);
+            });
+        });
+    }
+</script>
 {% endblock %}

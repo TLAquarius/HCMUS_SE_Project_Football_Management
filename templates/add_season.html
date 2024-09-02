@@ -4,7 +4,7 @@
 
 {% block sidebar %}
 <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
-<button class="btn btn-secondary btn-block" onclick="window.location.href='/rule-change'">Chỉnh sửa luật giải</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/rule_change'">Chỉnh sửa luật giải</button>
 {% endblock %}
 
 {% block content %}
@@ -18,7 +18,7 @@
             </div>
             <div class="form-group col-md-6">
                 <div class="image-preview">
-                    <img src="{{ url_for('static', filename='images/default_season_logo.png') }}" alt="Logo giải mặc định" style="width: 150px; height: 150px;" id="seasonLogoPreview">
+                    <img src="{{ url_for('static', filename='images/default_season_logo.jpg') }}" alt="Logo giải mặc định" style="width: 150px; height: 150px;" id="seasonLogoPreview">
                 </div>
             </div>
         </div>

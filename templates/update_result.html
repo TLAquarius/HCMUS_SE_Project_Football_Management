@@ -3,25 +3,40 @@
 {% block title %}Cập Nhật Kết Quả Trận Đấu{% endblock %}
 
 {% block sidebar %}
-    {{ super() }} <!-- Include existing sidebar content from base.html -->
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+    <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Quay lại</button>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Cập Nhật Kết Quả Trận Đấu</h2>
 
-    <!-- Search Bar -->
-    <div class="form-group">
-        <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm trận đấu">
-    </div>
+    <!-- Search Form -->
+    <form id="searchForm" method="GET" action="{{ url_for('update_result', season_id=season_id) }}">
+        <div class="form-row">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="team_name" placeholder="Tìm kiếm theo tên đội">
+            </div>
+            <div class="col-md-3">
+                <input type="number" class="form-control" name="round_number" placeholder="Tìm kiếm theo vòng">
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control" name="match_date" placeholder="Tìm kiếm theo ngày">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-block">Tìm kiếm</button>
+            </div>
+        </div>
+    </form>
 
     <!-- Matches Table -->
-    <table class="table table-striped" id="matchesTable">
+    <table class="table table-striped mt-4" id="matchesTable">
         <thead>
             <tr>
                 <th>Đội Nhà</th>
                 <th>Đội Khách</th>
                 <th>Ngày-Giờ</th>
+                <th>Vòng</th>
                 <th>Sân</th>
                 <th>Chọn</th>
             </tr>
@@ -32,47 +47,549 @@
                 <td>{{ match.host_team.name }}</td>
                 <td>{{ match.guest_team.name }}</td>
                 <td>{{ match.match_datetime }}</td>
+                <td>{{ match.round_number }}</td>
                 <td>{{ match.stadium }}</td>
-                <td><button type="button" class="btn btn-primary" onclick="selectMatch({{ match.id }}, '{{ match.host_team.name }}', '{{ match.guest_team.name }}')">Chọn</button></td>
+                <td>
+                    <button type="button" class="btn btn-primary"
+                            onclick="selectMatch('{{ match.id }}', '{{ match.host_team_id }}', '{{ match.guest_team_id }}', '{{ match.host_team_name }}', '{{ match.guest_team_name }}', '{{ match.host_team.profile_picture }}', '{{ match.guest_team.profile_picture }}', '{{ match.host_score }}', '{{ match.guest_score }}')">Chọn</button>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Score Form -->
-    <div id="scoreForm" class="mt-4" style="display: none;">
-        <h4>Nhập Kết Quả</h4>
-        <form id="resultForm" method="post" action="{{ url_for('update_result', season_id=season_id) }}">
-            <input type="hidden" id="selectedMatchId" name="match_id">
-
-            <div class="form-group">
-                <label for="hostScore">Tỷ số Đội Nhà:</label>
-                <input type="number" class="form-control" id="hostScore" name="host_score" required>
+    <!-- Match Detail Section -->
+    <div id="matchDetail" style="display: none; margin-top: 20px;">
+        <h4>Kết Quả Trận Đấu</h4>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <img id="hostTeamLogo" src="" alt="Host Team Logo" class="team-logo">
+                <p id="hostTeamName"></p>
             </div>
-
-            <div class="form-group">
-                <label for="guestScore">Tỷ số Đội Khách:</label>
-                <input type="number" class="form-control" id="guestScore" name="guest_score" required>
+            <div class="col-md-4">
+                <p><strong>Tỷ số</strong></p>
+                <h3 id="matchScore"></h3>
             </div>
-
-            <h5>Nhập Kết Quả Bàn Thắng</h5>
-            <table class="table table-bordered" id="resultTable">
-                <thead>
-                    <tr>
-                        <th>Cầu Thủ</th>
-                        <th>Loại Bàn Thắng</th>
-                        <th>Thời Điểm</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dynamic Rows Here -->
-                </tbody>
-            </table>
-            <button type="button" class="btn btn-success" onclick="addResultRow()">Thêm Bàn Thắng</button>
-            <button type="submit" class="btn btn-primary mt-3">Cập Nhật Kết Quả</button>
-        </form>
+            <div class="col-md-4">
+                <img id="guestTeamLogo" src="" alt="Guest Team Logo" class="team-logo">
+                <p id="guestTeamName"></p>
+            </div>
+        </div>
     </div>
+
+    <!-- Only display the result table when a match is selected -->
+    <div id="resultSection" style="display: none;">
+        <h4>Chi Tiết Các Bàn Thắng</h4>
+        <div class="results-container">
+            <div class="table-wrapper">
+                <table class="table table-bordered" id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>Thời điểm ghi bàn (phút)</th>
+                            <th>Đội ghi bàn</th>
+                            <th>Cầu thủ</th>
+                            <th>Loại bàn thắng</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultTableBody">
+                        <tr>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <button type="button" class="btn btn-success" onclick="addEventRow()">Thêm Bàn Thắng</button>
+        <button id="submitButton" type="button" class="btn btn-primary">Xác nhận chỉnh sửa</button>
+    </div>
+    <select class="player-select-data" style="display:none;">
+        {% for player in players %}
+        <option value="{{ player.id }}" data-team-id="{{ player.team_id }}">{{ player.name }}</option>
+        {% endfor %}
+    </select>
+
+    <form id="submitForm" method="POST" action="{{ url_for('update_result', season_id=season_id) }}">
+    <!-- Hidden inputs will be added here dynamically -->
+    </form>
 </div>
-<script src="{{ url_for('static', filename='js/update_result.js') }}"></script>
+
+<style>
+    .team-logo {
+        width: 100px;  /* Adjust as needed */
+        height: 100px; /* Adjust as needed */
+        object-fit: cover; /* Maintains aspect ratio and covers the specified dimensions */
+    }
+
+    .results-container {
+        max-height: 300px; /* Adjust based on your design */
+        overflow-y: auto;
+        border: 1px solid #ddd; /* Optional: Add a border around the container */
+    }
+
+    .table-wrapper {
+        position: relative;
+    }
+
+    .table-wrapper thead {
+        position: sticky;
+        top: 0;
+        background-color: #f4f4f4; /* Optional: Add a background color for the header */
+        z-index: 1; /* Ensure the header stays above the scrolling content */
+    }
+
+    .table-wrapper th, .table-wrapper td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    .table-wrapper th {
+        background-color: #f4f4f4; /* Optional: Add a background color for the header cells */
+    }
+</style>
+
+<script>
+    let selectedMatchId = null;
+    let matchHostTeamId = null;
+    let matchGuestTeamId = null;
+    const maxTime = {{ maximum_score_time }};
+    var allResults = [
+        {% for result in results %}
+        {
+            id: '{{ result.id }}',
+            match_id: '{{ result.match_id }}',
+            score_time: '{{ result.score_time }}',
+            team: {
+                id: '{{ result.team.id }}',
+                name: '{{ result.team.name }}'
+            },
+            player: {
+                id: '{{ result.player.id }}',
+                name: '{{ result.player.name }}'
+            },
+            score_type: {
+                id: '{{ result.score_type.id }}',
+                name: '{{ result.score_type.name }}'
+            }
+        }
+        {% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    function selectMatch(matchId, hostTeamId, guestTeamId, hostTeamName, guestTeamName, hostTeamLogo, guestTeamLogo, hostTeamGoals, guestTeamGoals) {
+        // Display match details
+        selectedMatchId = matchId;
+        matchHostTeamId = hostTeamId;
+        matchGuestTeamId = guestTeamId;
+        document.getElementById("hostTeamLogo").src = '/static/' + hostTeamLogo;
+        document.getElementById("guestTeamLogo").src = '/static/' + guestTeamLogo;
+        document.getElementById("hostTeamName").innerText = hostTeamName;
+        document.getElementById("guestTeamName").innerText = guestTeamName;
+        document.getElementById("matchScore").innerText = hostTeamGoals + " - " + guestTeamGoals;
+
+        // Show match detail and results sections
+        document.getElementById("matchDetail").style.display = "block";
+        fetchResultsForMatch(matchId);
+    }
+
+    function fetchResultsForMatch(matchId) {
+        // Simulate fetching results (replace with actual server-side request)
+        // Example static data. Replace with actual AJAX request.
+        let results = allResults.filter(result => result.match_id === selectedMatchId);
+
+        let tbody = document.getElementById('resultTableBody');
+        tbody.innerHTML = ''; // Clear existing rows
+
+        results.forEach(result => {
+            let row = document.createElement('tr');
+
+            // Create hidden inputs for IDs
+            let teamIdInput = `<input type="hidden" class="team-id" value="${result.team.id}">`;
+            let playerIdInput = `<input type="hidden" class="player-id" value="${result.player.id}">`;
+            let scoreTypeIdInput = `<input type="hidden" class="score-type-id" value="${result.score_type.id}">`;
+
+            row.setAttribute('data-result-id', result.id);
+
+            row.innerHTML = `
+                <td>${result.score_time}</td>
+                <td>${result.team.name}${teamIdInput}</td>
+                <td>${result.player.name}${playerIdInput}</td>
+                <td>${result.score_type.name}${scoreTypeIdInput}</td>
+                <td>
+                    <button type="button" class="btn btn-success" onclick="editResult('${result.id}')">Sửa</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteResult('${result.id}')">Xóa</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        document.getElementById("resultSection").style.display = "block";
+    }
+
+    function addEventRow() {
+        // Create a new row with input fields
+        let row = document.createElement('tr');
+        row.innerHTML = `
+            <td><input type="number" min="1" class="form-control" placeholder="Phút" required></td>
+            <td>
+                <!-- Team Dropdown -->
+                <select class="team-select" onchange="loadPlayers(this)">
+                    <option value="">Chọn đội</option>
+                    <option value="${matchHostTeamId}">${document.getElementById('hostTeamName').innerText}</option>
+                    <option value="${matchGuestTeamId}">${document.getElementById('guestTeamName').innerText}</option>
+                </select>
+            </td>
+            <td>
+                <!-- Player Dropdown -->
+                <select class="player-select">
+                    <option value="">Chọn cầu thủ</option>
+                </select>
+            </td>
+            <td>
+                <select class="form-control" required>
+                    <option value="">Chọn loại bàn thắng</option>
+                    {% for score_type in score_types %}
+                        <option value="{{ score_type.id }}">{{ score_type.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <!-- Hidden inputs for IDs -->
+                <input type="hidden" class="team-id">
+                <input type="hidden" class="player-id">
+                <input type="hidden" class="score-type-id">
+                <button type="button" class="btn btn-success" onclick="confirmAddRow(this)">Xác nhận</button>
+                <button type="button" class="btn btn-danger" onclick="cancelAddRow(this)">Hủy</button>
+            </td>
+        `;
+        document.getElementById('resultTableBody').appendChild(row);
+    }
+
+
+    function loadPlayers(teamSelect) {
+        // Get the row containing the select element
+        let row = teamSelect.closest('tr');
+
+        // Get the player dropdown using the class selector
+        let playerDropdown = row.querySelector('.player-select');
+
+        // Check if the playerDropdown was found
+        if (playerDropdown) {
+            // Clear the current options
+            playerDropdown.innerHTML = '<option value="">Chọn cầu thủ</option>';
+
+            // Get the selected team and populate players
+            let selectedTeamId = teamSelect.value;
+            if (selectedTeamId) {
+                // Loop through players and add to dropdown
+                let players = document.querySelectorAll('.player-select-data option');
+                players.forEach(option => {
+                    if (option.dataset.teamId === selectedTeamId) {
+                        let newOption = document.createElement('option');
+                        newOption.value = option.value;
+                        newOption.text = option.text;
+                        playerDropdown.add(newOption);
+                    }
+                });
+            }
+        } else {
+            console.error('Player dropdown not found in the current row.');
+        }
+    }
+
+    function confirmAddRow(button) {
+        let confirmation = confirm("Bạn có chắc chắn muốn thêm kết quả này?");
+
+        if (confirmation) {
+        // Get the row and collect data
+            let row = button.closest('tr');
+
+            // Retrieve the necessary form elements in the current row
+            let minuteInput = row.querySelector('input[type="number"]');
+            let teamSelect = row.querySelector('select.team-select');
+            let playerSelect = row.querySelector('select.player-select');
+            let scoreTypeSelect = row.querySelector('select.form-control');
+
+            // Validate that all fields are filled
+            if (minuteInput && teamSelect && playerSelect && scoreTypeSelect) {
+                let minute = minuteInput.value;
+                let teamId = teamSelect.value;
+                let playerId = playerSelect.value;
+                let scoreTypeId = scoreTypeSelect.value;
+
+                // Ensure all fields have valid values
+                if (minute && teamId && playerId && scoreTypeId) {
+
+                    if (minute < 0 || minute > maxTime) {
+                        alert(`Thời gian ghi bàn phải nằm trong khoảng từ 0 đến ${maxTime}.`);
+                        return;
+                    }
+
+                    // Find the team, player, and score type objects from allResults
+                    let team = allResults.find(result => result.team.id === teamId)?.team || {};
+                    let player = allResults.find(result => result.player.id === playerId)?.player || {};
+                    let scoreType = allResults.find(result => result.score_type.id === scoreTypeId)?.score_type || {};
+                    let highestId = allResults.reduce((maxId, result) => Math.max(maxId, result.id), 0);
+
+                    // Prepare the new result object to be added to the table
+                    let newResult = {
+                        id: (highestId + 1).toString(),
+                        match_id: selectedMatchId,
+                        score_time: minute,
+                        team: {
+                            id: teamId,
+                            name: team.name || teamSelect.options[teamSelect.selectedIndex].text
+                        },
+                        player: {
+                            id: playerId,
+                            name: player.name || playerSelect.options[playerSelect.selectedIndex].text
+                        },
+                        score_type: {
+                            id: scoreTypeId,
+                            name: scoreType.name || scoreTypeSelect.options[scoreTypeSelect.selectedIndex].text
+                        }
+                    };
+
+                    // Add the new result to the list (e.g., allResults array)
+                    allResults.push(newResult);
+
+                    // Update the UI to reflect the new row being confirmed
+                    fetchResultsForMatch(selectedMatchId);
+                } else {
+                    alert("Vui lòng điền đầy đủ thông tin!");
+                }
+            } else {
+                console.error('Required elements were not found in the row.');
+            }
+        }
+    }
+
+    function cancelAddRow(button) {
+        let confirmation = confirm("Bạn có chắc chắn muốn hủy việc thêm kết quả này?");
+
+        if (confirmation) {
+            let row = button.closest('tr');
+            row.remove();
+        }
+    }
+
+    function deleteResult(resultId) {
+        let confirmation = confirm("Bạn có chắc chắn muốn xóa kết quả này?");
+
+        if (confirmation) {
+            // Find the index of the result in allResults with the given id
+            const resultIndex = allResults.findIndex(result => result.id === resultId);
+
+            if (resultIndex !== -1) {
+                // Remove the result from the allResults array
+                allResults.splice(resultIndex, 1);
+
+                // Update the UI to remove the corresponding row from the table
+                fetchResultsForMatch(selectedMatchId);
+            } else {
+                console.error(`Result with ID ${resultId} not found in allResults.`);
+            }
+        }
+    }
+
+    function editResult(resultId) {
+        // Find the result in the allResults array
+        let resultToEdit = allResults.find(result => result.id === resultId);
+        if (!resultToEdit) {
+            console.error('Result not found.');
+            return;
+        }
+
+        // Find the corresponding table row
+        let row = document.querySelector(`#resultTableBody tr[data-result-id="${resultId}"]`);
+        if (!row) {
+            console.error('Row not found.');
+            return;
+        }
+
+        // Get the cells of the row
+        let cells = row.querySelectorAll('td');
+
+        // Convert the cells to editable fields
+        cells[0].innerHTML = `<input type="number" min="1" class="form-control" value="${resultToEdit.score_time}" required>`;
+
+        // Team dropdown
+        cells[1].innerHTML = `
+            <select class="team-select" onchange="loadPlayers(this)">
+                <option value="${resultToEdit.team.id}">${resultToEdit.team.name}</option>
+                <option value="${matchHostTeamId}">${document.getElementById('hostTeamName').innerText}</option>
+                <option value="${matchGuestTeamId}">${document.getElementById('guestTeamName').innerText}</option>
+            </select>`;
+
+        // Player dropdown
+        cells[2].innerHTML = `<select class="player-select">
+                <option value="${resultToEdit.player.id}">${resultToEdit.player.name}</option>
+            </select>`;
+
+        // Score type dropdown
+        cells[3].innerHTML = `<select class="form-control" required>
+                <option value="${resultToEdit.score_type.id}">${resultToEdit.score_type.name}</option>
+                {% for score_type in score_types %}
+                    <option value="{{ score_type.id }}">{{ score_type.name }}</option>
+                {% endfor %}
+            </select>`;
+
+        // Change buttons to confirm and cancel
+        cells[4].innerHTML = `
+            <button type="button" class="btn btn-primary" onclick="confirmEditResult(this)">Xác nhận</button>
+            <button type="button" class="btn btn-secondary" onclick="cancelEditResult('${resultId}')">Hủy</button>
+        `;
+    }
+
+    function confirmEditResult(button) {
+        let confirmation = confirm("Bạn có chắc chắn muốn sửa kết quả này?");
+
+        if (confirmation) {
+            // Ensure button is a DOM element
+            if (!(button instanceof HTMLElement)) {
+                console.error('The provided button is not a valid DOM element.');
+                return;
+            }
+
+            // Get the row to be edited
+            let row = button.closest('tr');
+
+            // Retrieve the necessary form elements in the current row
+            let minuteInput = row.querySelector('input[type="number"]');
+            let teamSelect = row.querySelector('select.team-select');
+            let playerSelect = row.querySelector('select.player-select');
+            let scoreTypeSelect = row.querySelector('select.form-control');
+
+            // Validate that all fields are filled
+            if (minuteInput && teamSelect && playerSelect && scoreTypeSelect) {
+                let minute = minuteInput.value;
+                let teamId = teamSelect.value;
+                let playerId = playerSelect.value;
+                let scoreTypeId = scoreTypeSelect.value;
+
+                // Ensure all fields have valid values
+                if (minute && teamId && playerId && scoreTypeId) {
+                    // Find the result to edit based on data-result-id
+                    if (minute < 0 || minute > maxTime) {
+                        alert(`Thời gian ghi bàn phải nằm trong khoảng từ 0 đến ${maxTime}.`);
+                        return;
+                    }
+                    let resultId = row.getAttribute('data-result-id');
+                    let resultIndex = allResults.findIndex(result => result.id == resultId);
+
+                    if (resultIndex !== -1) {
+                        // Update the existing result
+                        allResults[resultIndex] = {
+                            id: resultId,  // Maintain the existing ID
+                            match_id: selectedMatchId,
+                            score_time: minute,
+                            team: {
+                                id: teamId,
+                                name: teamSelect.options[teamSelect.selectedIndex].text
+                            },
+                            player: {
+                                id: playerId,
+                                name: playerSelect.options[playerSelect.selectedIndex].text
+                            },
+                            score_type: {
+                                id: scoreTypeId,
+                                name: scoreTypeSelect.options[scoreTypeSelect.selectedIndex].text
+                            }
+                        };
+
+                        // Optionally, update the UI to reflect the changes
+                        fetchResultsForMatch(selectedMatchId);  // Refresh the table
+                    } else {
+                        console.error('Result not found for editing.');
+                    }
+                } else {
+                    alert("Vui lòng điền đầy đủ thông tin!");
+                }
+            } else {
+                console.error('Required elements were not found in the row.');
+            }
+        }
+    }
+
+    function cancelEditResult(resultId) {
+        let confirmation = confirm("Bạn có chắc chắn hủy thay đổi kết quả này?");
+
+        if (confirmation) {
+            fetchResultsForMatch(selectedMatchId);  // Refresh the table
+        }
+    }
+
+    function collectTableData() {
+        let confirmation = confirm("Bạn có chắc chắn xác nhận cập nhật kết quả?");
+
+        if (confirmation) {
+            let form = document.getElementById('submitForm');
+            if (!form) {
+                console.error('Form element with id "submitForm" not found.');
+                return;
+            }
+
+            let tbody = document.getElementById('resultTableBody');
+            if (!tbody) {
+                console.error('Table body element with id "resultTableBody" not found.');
+                return;
+            }
+
+            tbody.querySelectorAll('tr').forEach((row, index) => {
+                let cells = row.querySelectorAll('td');
+                if (cells.length < 4) {
+                    console.error('Row does not have the expected number of cells.');
+                    return;
+                }
+
+                let scoreTime = cells[0].textContent.trim();
+                let teamIdHiddenInput = row.querySelector('.team-id');
+                let playerIdHiddenInput = row.querySelector('.player-id');
+                let scoreTypeIdHiddenInput = row.querySelector('.score-type-id');
+
+                if (!teamIdHiddenInput || !playerIdHiddenInput || !scoreTypeIdHiddenInput) {
+                    console.error('Hidden inputs not found in the row.');
+                    return;
+                }
+
+                let teamId = teamIdHiddenInput.value;
+                let playerId = playerIdHiddenInput.value;
+                let scoreTypeId = scoreTypeIdHiddenInput.value;
+
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `result[${index}][score_time]`;
+                input.value = scoreTime;
+                form.appendChild(input);
+
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `result[${index}][team_id]`;
+                input.value = teamId;
+                form.appendChild(input);
+
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `result[${index}][player_id]`;
+                input.value = playerId;
+                form.appendChild(input);
+
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `result[${index}][score_type_id]`;
+                input.value = scoreTypeId;
+                form.appendChild(input);
+            });
+
+            let matchInput = document.createElement('input');
+            matchInput.type = 'hidden';
+            matchInput.name = 'match_id';
+            matchInput.value = selectedMatchId;
+            form.appendChild(matchInput);
+
+            form.submit();
+        }
+    }
+
+// Call this function when you need to submit the form with all table data
+    document.getElementById('submitButton').addEventListener('click', collectTableData);
+
+</script>
 {% endblock %}

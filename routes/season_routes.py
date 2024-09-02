@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from models import db, Season, Team, Player, Match, MatchResult, TeamRanking, ScoreType
 import os
 from werkzeug.utils import secure_filename
@@ -26,7 +26,7 @@ def setup_season_routes(app):
                 profile_picture_path = os.path.join('static/images', profile_picture_filename)
                 profile_picture.save(profile_picture_path)
             else:
-                profile_picture_filename = 'default_season_logo.png'
+                profile_picture_filename = 'default_season_logo.jpg'
 
             new_season = Season(name=season_name, note=season_note, profile_picture='images/' + profile_picture_filename)
             new_season.update_latest_rule_id()
@@ -48,3 +48,22 @@ def setup_season_routes(app):
         db.session.delete(season)
         db.session.commit()
         return redirect(url_for('home'))
+    
+    @app.route('/delete_seasons', methods=['GET', 'POST'])
+    def delete_seasons():
+        if request.method == 'POST':
+            season_ids = request.form.getlist('season_ids')
+            for season_id in season_ids:
+                season = Season.query.get_or_404(int(season_id))
+                db.session.delete(season)
+            db.session.commit()
+            return redirect(url_for('home'))
+        seasons = Season.query.all()
+        return render_template('delete_season.html', seasons = seasons)
+    
+    @app.route('/search-seasons', methods=['POST'])
+    def search_seasons():
+        search_value = request.get_json()['search_value']
+        seasons = Season.query.filter(Season.name.like('%' + search_value + '%')).all()
+        data = [{'id': season.id, 'name': season.name, 'profile_picture': season.profile_picture} for season in seasons]
+        return jsonify(data)
