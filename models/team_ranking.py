@@ -47,34 +47,46 @@ class TeamRanking(db.Model):
     def update_score(self):
         wins_as_host = Match.query.filter(
             Match.host_team_id == self.team_id,
-            Match.host_score > Match.guest_score
+            Match.host_score > Match.guest_score,
+            Match.host_score.isnot(None),
+            Match.guest_score.isnot(None)
         ).count()
 
         wins_as_guest = Match.query.filter(
             Match.guest_team_id == self.team_id,
-            Match.host_score < Match.guest_score
+            Match.host_score < Match.guest_score,
+            Match.host_score.isnot(None),
+            Match.guest_score.isnot(None)
         ).count()
         self.total_wins = wins_as_host + wins_as_guest
 
         lose_as_host = Match.query.filter(
             Match.host_team_id == self.team_id,
-            Match.host_score < Match.guest_score
+            Match.host_score < Match.guest_score,
+            Match.host_score.isnot(None),
+            Match.guest_score.isnot(None)
         ).count()
 
         lose_as_guest = Match.query.filter(
             Match.guest_team_id == self.team_id,
-            Match.host_score > Match.guest_score
+            Match.host_score > Match.guest_score,
+            Match.host_score.isnot(None),
+            Match.guest_score.isnot(None)
         ).count()
         self.total_losses = lose_as_host + lose_as_guest
 
         draw_as_host = Match.query.filter(
             Match.host_team_id == self.team_id,
-            Match.host_score == Match.guest_score
+            Match.host_score == Match.guest_score,
+            Match.host_score.isnot(None),
+            Match.guest_score.isnot(None)
         ).count()
 
         draw_as_guest = Match.query.filter(
             Match.guest_team_id == self.team_id,
-            Match.host_score == Match.guest_score
+            Match.host_score == Match.guest_score,
+            Match.host_score.isnot(None),
+            Match.guest_score.isnot(None)
         ).count()
         self.total_draws = draw_as_host + draw_as_guest
         self.win_loss_difference = self.total_wins - self.total_losses

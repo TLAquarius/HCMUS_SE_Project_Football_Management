@@ -304,7 +304,7 @@
         const playerNote = document.getElementById('playerNote');
         const playerProfilePicture = document.getElementById('playerProfilePicture').files[0];
 
-        if (!playerName.value.trim()||!playerBirthday.value) {
+        if (!playerName.value.trim()||!playerBirthday.value||!/^[\p{L}\s]+$/u.test(playerName.value.trim())) {
             if (!playerBirthday.value) {
                 playerBirthday.classList.add('is-invalid');
             }

@@ -182,7 +182,12 @@
         document.getElementById("guestTeamLogo").src = '/static/' + guestTeamLogo;
         document.getElementById("hostTeamName").innerText = hostTeamName;
         document.getElementById("guestTeamName").innerText = guestTeamName;
-        document.getElementById("matchScore").innerText = hostTeamGoals + " - " + guestTeamGoals;
+
+        if (hostTeamGoals == "None" || guestTeamGoals == "None"){
+            document.getElementById("matchScore").innerText = " - ";
+        }else{
+            document.getElementById("matchScore").innerText = hostTeamGoals + " - " + guestTeamGoals;
+        }
 
         // Show match detail and results sections
         document.getElementById("matchDetail").style.display = "block";

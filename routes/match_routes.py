@@ -133,6 +133,12 @@ def setup_match_routes(app):
                 if player:
                     player.update_total_score()
 
+            team_ids = db.session.query(Team.id).filter_by(season_id=season_id).all()
+            for team_id in team_ids:
+                team_ranking = TeamRanking.query.get(team_id[0])
+                if not team_ranking:
+                    TeamRanking.insert_default_value(team_id[0])
+
             # Step 5: Update team rankings
             for team_id in match_teams:
                 team_ranking = TeamRanking.query.get(team_id)
