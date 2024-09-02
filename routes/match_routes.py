@@ -84,7 +84,6 @@ def setup_match_routes(app):
             # Step 2: Collect new results from the form
             i = 0
             results = []
-            teams_that_scored = set()
             while True:
                 score_time = request.form.get(f'result[{i}][score_time]')
                 team_id = request.form.get(f'result[{i}][team_id]')
@@ -105,8 +104,6 @@ def setup_match_routes(app):
                 )
                 db.session.add(new_result)
 
-                teams_that_scored.add(team_id)
-
                 result = {
                     'match_id': match_id,
                     'score_time': score_time,
@@ -125,6 +122,10 @@ def setup_match_routes(app):
             if match:
                 match.update_match_score()
 
+            match_teams = set()
+            match_teams.add(match.host_team_id)
+            match_teams.add(match.guest_team_id)
+
             # Step 4: Update players' total scores
             player_ids_with_scores = {result['player_id'] for result in results}
             for player_id in player_ids_with_scores:
@@ -132,19 +133,15 @@ def setup_match_routes(app):
                 if player:
                     player.update_total_score()
 
-            team_ids = db.session.query(Team.id).filter_by(season_id=season_id).all()
-            for team_id in team_ids:
-                team_ranking = TeamRanking.query.get(team_id[0])
-                if not team_ranking:
-                    TeamRanking.insert_default_value(team_id[0])
-
             # Step 5: Update team rankings
-            for team_id in teams_that_scored:
+            for team_id in match_teams:
                 team_ranking = TeamRanking.query.get(team_id)
-                if team_ranking:
-                    team_ranking.update_score()
-                    team_ranking.update_total_goals()
-                    team_ranking.update_points()
+                if not team_ranking:
+                    TeamRanking.insert_default_value(team_id)
+                    team_ranking = TeamRanking.query.get(team_id)
+                team_ranking.update_score()
+                team_ranking.update_total_goals()
+                team_ranking.update_points()
             TeamRanking.update_rankings(season_id)
 
 

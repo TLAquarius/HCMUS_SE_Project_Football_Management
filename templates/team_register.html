@@ -165,7 +165,7 @@
 
 
 <script>
-   function validateForm() {
+    function validateForm() {
         let isValid = true;
 
         const minPlayers = {{ minimum_players }};
@@ -268,10 +268,10 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const playerProfilePicturePreview = document.getElementById('playerProfilePicturePreview');
-        const defaultPlayerPicturePath = "{{ url_for('static', filename='images/default_player.png') }}";
+       const defaultPlayerPicturePath = "{{ url_for('static', filename='images/default_player.png') }}";
 
-        // Set the default player picture when the page loads
-        playerProfilePicturePreview.src = defaultPlayerPicturePath;
+       // Set the default player picture when the page loads
+       playerProfilePicturePreview.src = defaultPlayerPicturePath;
     });
 
     document.getElementById('playerProfilePicture').addEventListener('change', function() {
@@ -290,6 +290,8 @@
             playerProfilePicturePreview.src = defaultPlayerPicturePath;
         }
     });
+
+    let rowCounter = 0
 
     function addPlayer() {
         const maxForeignPlayers = {{ max_foreign_players }};
@@ -313,7 +315,6 @@
         }
 
         const currentForeignPlayers = Array.from(document.querySelectorAll('#playerListTable tbody tr td:nth-child(4)')).filter(td => td.textContent.trim() === 'Nước ngoài').length;
-
         if (playerType.value === 'Nước ngoài' && currentForeignPlayers >= maxForeignPlayers) {
             alert('Số lượng cầu thủ nước ngoài vượt quá quy định.');
             return;
@@ -326,7 +327,7 @@
 
         // Adjust age if the birthday hasn't occurred yet this year
         if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
+           age--;
         }
         // Validate age
         if (age < minAge || age > maxAge) {
@@ -350,6 +351,9 @@
         const typeCell = newRow.insertCell(3);
         const actionCell = newRow.insertCell(4);
 
+        rowCounter++; // Increment counter for unique ID
+        const uniqueId = rowCounter;
+
         if (playerProfilePicture) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -368,22 +372,25 @@
         removeButton.className = 'btn btn-danger btn-sm';
         removeButton.textContent = 'Xóa';
         removeButton.onclick = function() {
+            const form = document.getElementById('team-form');
+            const hiddenInputs = form.querySelectorAll(`input[data-row-id="${uniqueId}"]`);
+            console.log('test:', uniqueId);
+            hiddenInputs.forEach(input => form.removeChild(input));
             table.deleteRow(newRow.rowIndex - 1);
         };
         actionCell.appendChild(removeButton);
 
         // Add hidden inputs to the form
         const form = document.getElementById('team-form');
-        form.appendChild(createHiddenInput('player_name[]', playerName.value));
-        form.appendChild(createHiddenInput('player_type[]', playerType.value));
-        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday.value));
-        form.appendChild(createHiddenInput('player_note[]', playerNote.value));
+        form.appendChild(createHiddenInput('player_name[]', playerName.value, uniqueId));
+        form.appendChild(createHiddenInput('player_type[]', playerType.value, uniqueId));
+        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday.value, uniqueId));
+        form.appendChild(createHiddenInput('player_note[]', playerNote.value, uniqueId));
         if (playerProfilePicture) {
-            form.appendChild(createHiddenInput('player_profile_picture[]', playerProfilePicture.name));
+            form.appendChild(createHiddenInput('player_profile_picture[]', playerProfilePicture.name, newRow.rowIndex));
         } else {
-            form.appendChild(createHiddenInput('player_profile_picture[]', 'default_player.png'));
+            form.appendChild(createHiddenInput('player_profile_picture[]', 'default_player.png', newRow.rowIndex));
         }
-
 
         // Reset player form fields
         document.getElementById('playerName').value = '';
@@ -403,11 +410,12 @@
         this.classList.remove('is-invalid');
     });
 
-    function createHiddenInput(name, value) {
+    function createHiddenInput(name, value, rowId) {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = name;
         input.value = value;
+        input.setAttribute('data-row-id', rowId); // Add data attribute to identify the row
         return input;
     }
 </script>
