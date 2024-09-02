@@ -10,9 +10,39 @@
 {% block content %}
 <div class="container">
     <button class="btn btn-primary mb-3" onclick="window.location.href='/season/{{ season_id }}/auto_schedule'">Lập lịch tự động</button>
-    
+    {% if match_error %}
+    <div class="alert alert-danger">{{ match_error }}</div>
+    {% endif %}
+    {% if finished_matches %}
+    <table class="table table-bordered">
+        <h5 class="table-title">Các trận đấu đã diễn ra</h5>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Đội chủ nhà</th>
+                <th>Đội khách</th>
+                <th>Vòng đấu</th>
+                <th>Sân</th>
+                <th>Ngày-Giờ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in finished_matches %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ match.host_team.name }}</td>
+                <td>{{ match.guest_team.name }}</td>
+                <td>{{ match.round_number }}</td>
+                <td>{{ match.host_team.stadium }}</td>
+                <td>{{ match.match_datetime }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
     {% if matches %}
     <table class="table table-bordered">
+        <h5 class="table-title">Các trận đấu sắp tới</h5>
         <thead>
             <tr>
                 <th>STT</th>
@@ -73,7 +103,7 @@
     </form>
     
     {% else %}
-    <p>Chưa có trận đấu nào được lên lịch.</p>
+    <p>Không có trận đấu sắp tới.</p>
     {% endif %}
 </div>
 

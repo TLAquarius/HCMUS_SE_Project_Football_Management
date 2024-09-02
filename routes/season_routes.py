@@ -10,10 +10,9 @@ def setup_season_routes(app):
         season = Season.query.get_or_404(season_id)
         teams = Team.query.filter_by(season_id=season_id).all()
         players = Player.query.filter_by(season_id=season_id).all()
-        matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id, Match.match_datetime < datetime.utcnow()).order_by(Match.match_datetime.desc()).all()
-        match_results = MatchResult.query.filter_by(season_id=season_id).all()
+        matches = Match.query.join(Match.host_team).filter(Team.season_id == season_id, Match.host_score.isnot(None)).order_by(Match.match_datetime.desc()).all()
         team_rankings = TeamRanking.query.join(Team).filter(Team.season_id == season_id).order_by(TeamRanking.ranking).all()
-        return render_template('season_main.html', season=season, teams=teams, players=players, matches=matches, match_results=match_results, team_rankings=team_rankings)
+        return render_template('season_main.html', season=season, teams=teams, players=players, matches=matches, team_rankings=team_rankings)
     @app.route('/add_season', methods=['GET', 'POST'])
     def add_season():
         if request.method == 'POST':
