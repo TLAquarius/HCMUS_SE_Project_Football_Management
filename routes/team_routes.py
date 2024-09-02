@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, jsonify
+from flask import render_template, request, redirect, url_for
 from models import db, Team, Player, TeamRanking, Season
 import os
 from werkzeug.utils import secure_filename
@@ -111,4 +111,5 @@ def setup_team_routes(app):
         team.name = team_name
         team.stadium = team_stadium
         db.session.commit()
-        return jsonify({'message': 'Team information updated successfully'})
+        season = Season.query.join(Team).filter(Team.id == team_id).first()
+        return redirect(url_for('view_team', season_id=season.id, team_id=team.id))
