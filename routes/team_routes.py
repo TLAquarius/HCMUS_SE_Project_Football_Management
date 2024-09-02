@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, jsonify
-from models import db, Team, Player, TeamRanking, Season
+from models import db, Team, Player, TeamRanking, Season, MatchResult
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -63,8 +63,11 @@ def setup_team_routes(app):
 
         season = Season.query.get(season_id)
         rule = season.rule
+        match_result = MatchResult.query.join(Team, MatchResult.team_id == Team.id) \
+            .filter(Team.season_id == season_id).first()
 
         return render_template('team_register.html',
+                               match_result = match_result,
                                season_id=season_id,
                                max_foreign_players=rule.maximum_foreign_players,
                                minimum_age=rule.minimum_age,
