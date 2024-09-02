@@ -10,118 +10,123 @@
 {% block content %}
 <div class="container mt-4">
     <!-- Part 1: Team Information -->
-    <div class="card mb-4">
-        <div class="card-header">
-            Thông Tin Đội Bóng
+    {% if match_result  %}
+        <div class="alert alert-danger">
+            Đã hết thời hạn đăng ký tham gia giải do mùa giải đã bắt đầu.
         </div>
-        <div class="card-body">
-            <form id="team-form" action="{{ url_for('register_team', season_id=season_id) }}" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="season_id" value="{{ season_id }}">
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="teamName">Tên Đội</label>
-                        <input type="text" class="form-control" id="teamName" name="team_name" pattern="[\p{L}\s]+$" required>
-                        <div class="invalid-feedback">
-                            Tên đội chỉ có thể chứa chữ cái và không được để trống.
+    {% else %}
+        <div class="card mb-4">
+            <div class="card-header">
+                Thông Tin Đội Bóng
+            </div>
+            <div class="card-body">
+                <form id="team-form" action="{{ url_for('register_team', season_id=season_id) }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="season_id" value="{{ season_id }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="teamName">Tên Đội</label>
+                            <input type="text" class="form-control" id="teamName" name="team_name" pattern="[\p{L}\s]+$" required>
+                            <div class="invalid-feedback">
+                                Tên đội chỉ có thể chứa chữ cái và không được để trống.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="teamStadium">Tên Sân Nhà</label>
+                            <input type="text" class="form-control" id="teamStadium" name="team_stadium" required>
+                            <div class="invalid-feedback">
+                                Sân vận động không được để trống.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="teamLogo">Nhập logo đội bóng</label>
+                            <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
+                        </div>
+                        <div class="form-group col-md-6 text-center">
+                            <label>Logo đội bóng</label>
+                            <div class="image-preview">
+                                <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Logo đội mặc định" style="width: 150px; height: 150px;" id="teamLogoPreview">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="teamStadium">Tên Sân Nhà</label>
-                        <input type="text" class="form-control" id="teamStadium" name="team_stadium" required>
-                        <div class="invalid-feedback">
-                            Sân vận động không được để trống.
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="teamLogo">Nhập logo đội bóng</label>
-                        <input type="file" class="form-control-file" id="teamLogo" name="profile_picture" required>
-                    </div>
-                    <div class="form-group col-md-6 text-center">
-                        <label>Logo đội bóng</label>
-                        <div class="image-preview">
-                            <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Logo đội mặc định" style="width: 150px; height: 150px;" id="teamLogoPreview">
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Part 2: Player Information -->
-    <div class="card mb-4">
-        <div class="card-header">
-            Thêm Cầu Thủ
-        </div>
-        <div class="card-body">
-            <div class="player-form">
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="playerName">Tên Cầu Thủ</label>
-                        <input type="text" class="form-control" id="playerName" pattern="[\p{L}\s]+$" required>
-                        <div class="invalid-feedback">
-                            Tên cầu thủ chỉ có thể chứa chữ cái và không được để trống.
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="playerType">Loại Cầu Thủ</label>
-                        <select class="form-control" id="playerType" required>
-                            <option value="Trong nước">Trong nước</option>
-                            <option value="Nước ngoài">Nước ngoài</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="playerBirthday">Ngày Sinh</label>
-                        <input type="date" class="form-control" id="playerBirthday" required>
-                        <div class="invalid-feedback">
-                            Ngày sinh không được để trống.
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="playerNote">Ghi Chú</label>
-                        <input type="text" class="form-control" id="playerNote">
-                    </div>
-                    <div class="form-group col-md-6 text-center">
-                        <label>Nhập ảnh cầu thủ</label>
-                        <input type="file" class="form-control-file" id="playerProfilePicture" name="player_profile_picture" required>
-                    </div>
-                    <div class="form-group col-md-6 text-center">
-                        <label>Ảnh đại diện</label>
-                        <div class="image-preview">
-                            <img src="{{ url_for('static', filename='images/default_player.png') }}" alt="Ảnh đại diện mặc định" style="width: 150px; height: 150px;" id="playerProfilePicturePreview">
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-secondary" onclick="addPlayer()">Thêm Cầu Thủ</button>
+                </form>
             </div>
         </div>
-    </div>
 
-    <button type="button" class="btn btn-secondary" onclick="confirmRegistration()">Xác Nhận Đăng Ký Đội</button>
-    <!-- Players List Section -->
-    <div class="card mb-4">
-        <div class="card-header">
-            Danh Sách Cầu Thủ Đội
+        <!-- Part 2: Player Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                Thêm Cầu Thủ
+            </div>
+            <div class="card-body">
+                <div class="player-form">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="playerName">Tên Cầu Thủ</label>
+                            <input type="text" class="form-control" id="playerName" pattern="[\p{L}\s]+$" required>
+                            <div class="invalid-feedback">
+                                Tên cầu thủ chỉ có thể chứa chữ cái và không được để trống.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="playerType">Loại Cầu Thủ</label>
+                            <select class="form-control" id="playerType" required>
+                                <option value="Trong nước">Trong nước</option>
+                                <option value="Nước ngoài">Nước ngoài</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="playerBirthday">Ngày Sinh</label>
+                            <input type="date" class="form-control" id="playerBirthday" required>
+                            <div class="invalid-feedback">
+                                Ngày sinh không được để trống.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="playerNote">Ghi Chú</label>
+                            <input type="text" class="form-control" id="playerNote">
+                        </div>
+                        <div class="form-group col-md-6 text-center">
+                            <label>Nhập ảnh cầu thủ</label>
+                            <input type="file" class="form-control-file" id="playerProfilePicture" name="player_profile_picture" required>
+                        </div>
+                        <div class="form-group col-md-6 text-center">
+                            <label>Ảnh đại diện</label>
+                            <div class="image-preview">
+                                <img src="{{ url_for('static', filename='images/default_player.png') }}" alt="Ảnh đại diện mặc định" style="width: 150px; height: 150px;" id="playerProfilePicturePreview">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addPlayer()">Thêm Cầu Thủ</button>
+                </div>
+            </div>
         </div>
-        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-            <table id="playerListTable" class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Ảnh đại diện</th>
-                        <th scope="col">Tên cầu thủ</th>
-                        <th scope="col">Ngày sinh</th>
-                        <th scope="col">Loại cầu thủ</th>
-                        <th scope="col">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Players will be dynamically added here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
 
+        <button type="button" class="btn btn-secondary" onclick="confirmRegistration()">Xác Nhận Đăng Ký Đội</button>
+        <!-- Players List Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                Danh Sách Cầu Thủ Đội
+            </div>
+            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                <table id="playerListTable" class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ảnh đại diện</th>
+                            <th scope="col">Tên cầu thủ</th>
+                            <th scope="col">Ngày sinh</th>
+                            <th scope="col">Loại cầu thủ</th>
+                            <th scope="col">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Players will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Confirmation Modal -->
@@ -160,7 +165,7 @@
 
 
 <script>
-   function validateForm() {
+    function validateForm() {
         let isValid = true;
 
         const minPlayers = {{ minimum_players }};
@@ -263,10 +268,10 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const playerProfilePicturePreview = document.getElementById('playerProfilePicturePreview');
-        const defaultPlayerPicturePath = "{{ url_for('static', filename='images/default_player.png') }}";
+       const defaultPlayerPicturePath = "{{ url_for('static', filename='images/default_player.png') }}";
 
-        // Set the default player picture when the page loads
-        playerProfilePicturePreview.src = defaultPlayerPicturePath;
+       // Set the default player picture when the page loads
+       playerProfilePicturePreview.src = defaultPlayerPicturePath;
     });
 
     document.getElementById('playerProfilePicture').addEventListener('change', function() {
@@ -286,6 +291,8 @@
         }
     });
 
+    let rowCounter = 0
+
     function addPlayer() {
         const maxForeignPlayers = {{ max_foreign_players }};
         const minAge = {{ minimum_age }};
@@ -297,7 +304,7 @@
         const playerNote = document.getElementById('playerNote');
         const playerProfilePicture = document.getElementById('playerProfilePicture').files[0];
 
-        if (!playerName.value.trim()||!playerBirthday.value) {
+        if (!playerName.value.trim()||!playerBirthday.value||!/^[\p{L}\s]+$/u.test(playerName.value.trim())) {
             if (!playerBirthday.value) {
                 playerBirthday.classList.add('is-invalid');
             }
@@ -308,7 +315,6 @@
         }
 
         const currentForeignPlayers = Array.from(document.querySelectorAll('#playerListTable tbody tr td:nth-child(4)')).filter(td => td.textContent.trim() === 'Nước ngoài').length;
-
         if (playerType.value === 'Nước ngoài' && currentForeignPlayers >= maxForeignPlayers) {
             alert('Số lượng cầu thủ nước ngoài vượt quá quy định.');
             return;
@@ -321,7 +327,7 @@
 
         // Adjust age if the birthday hasn't occurred yet this year
         if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
+           age--;
         }
         // Validate age
         if (age < minAge || age > maxAge) {
@@ -345,6 +351,9 @@
         const typeCell = newRow.insertCell(3);
         const actionCell = newRow.insertCell(4);
 
+        rowCounter++; // Increment counter for unique ID
+        const uniqueId = rowCounter;
+
         if (playerProfilePicture) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -363,22 +372,25 @@
         removeButton.className = 'btn btn-danger btn-sm';
         removeButton.textContent = 'Xóa';
         removeButton.onclick = function() {
+            const form = document.getElementById('team-form');
+            const hiddenInputs = form.querySelectorAll(`input[data-row-id="${uniqueId}"]`);
+            console.log('test:', uniqueId);
+            hiddenInputs.forEach(input => form.removeChild(input));
             table.deleteRow(newRow.rowIndex - 1);
         };
         actionCell.appendChild(removeButton);
 
         // Add hidden inputs to the form
         const form = document.getElementById('team-form');
-        form.appendChild(createHiddenInput('player_name[]', playerName.value));
-        form.appendChild(createHiddenInput('player_type[]', playerType.value));
-        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday.value));
-        form.appendChild(createHiddenInput('player_note[]', playerNote.value));
+        form.appendChild(createHiddenInput('player_name[]', playerName.value, uniqueId));
+        form.appendChild(createHiddenInput('player_type[]', playerType.value, uniqueId));
+        form.appendChild(createHiddenInput('player_birthday[]', playerBirthday.value, uniqueId));
+        form.appendChild(createHiddenInput('player_note[]', playerNote.value, uniqueId));
         if (playerProfilePicture) {
-            form.appendChild(createHiddenInput('player_profile_picture[]', playerProfilePicture.name));
+            form.appendChild(createHiddenInput('player_profile_picture[]', playerProfilePicture.name, newRow.rowIndex));
         } else {
-            form.appendChild(createHiddenInput('player_profile_picture[]', 'default_player.png'));
+            form.appendChild(createHiddenInput('player_profile_picture[]', 'default_player.png', newRow.rowIndex));
         }
-
 
         // Reset player form fields
         document.getElementById('playerName').value = '';
@@ -398,11 +410,12 @@
         this.classList.remove('is-invalid');
     });
 
-    function createHiddenInput(name, value) {
+    function createHiddenInput(name, value, rowId) {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = name;
         input.value = value;
+        input.setAttribute('data-row-id', rowId); // Add data attribute to identify the row
         return input;
     }
 </script>

@@ -38,7 +38,7 @@
                 <th>Ngày-Giờ</th>
                 <th>Vòng</th>
                 <th>Sân</th>
-                <th>Chọn</th>
+                <th>Chọn trận</th>
             </tr>
         </thead>
         <tbody>
@@ -146,7 +146,6 @@
         background-color: #f4f4f4; /* Optional: Add a background color for the header cells */
     }
 </style>
-
 <script>
     let selectedMatchId = null;
     let matchHostTeamId = null;
@@ -183,7 +182,12 @@
         document.getElementById("guestTeamLogo").src = '/static/' + guestTeamLogo;
         document.getElementById("hostTeamName").innerText = hostTeamName;
         document.getElementById("guestTeamName").innerText = guestTeamName;
-        document.getElementById("matchScore").innerText = hostTeamGoals + " - " + guestTeamGoals;
+
+        if (hostTeamGoals == "None" || guestTeamGoals == "None"){
+            document.getElementById("matchScore").innerText = " - ";
+        }else{
+            document.getElementById("matchScore").innerText = hostTeamGoals + " - " + guestTeamGoals;
+        }
 
         // Show match detail and results sections
         document.getElementById("matchDetail").style.display = "block";
@@ -588,8 +592,7 @@
         }
     }
 
-// Call this function when you need to submit the form with all table data
+    // Call this function when you need to submit the form with all table data
     document.getElementById('submitButton').addEventListener('click', collectTableData);
-
 </script>
 {% endblock %}
