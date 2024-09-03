@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %} Xếp hạng cầu thủ {% endblock %}
+
+{% block sidebar %}
+{{ super() }}
+<button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_team_rank', season_id=season.id) }}'">Quay lại</button>
+{% endblock %}
+{% block content %}
+<div class="container text-center">
+    <h2 class="mt-4">Bảng Xếp Hạng Giải {{ season.name }}</h2>
+    <p>Ngày: {{ today }}</p>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th style="width: 350px;">Cầu Thủ</th>
+                <th style="width: 350px;">Đội</th>
+                <th>Loại Cầu Thủ</th>
+                <th>Tổng Số Bàn Thắng</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ player.name }}</td>
+                <td>{{ player.team.name }}</td>
+                <td>{{ player.player_type }}</td>
+                <td>{{ player.total_score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>    
+{% endblock %}

@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, url_for
-from models import db, Player, Team
+from models import db, Player, Team, Season
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 def setup_player_routes(app):
     @app.route('/register_player', methods=['GET', 'POST'])
@@ -50,3 +51,9 @@ def setup_player_routes(app):
             details = Player.query.join(Team).filter(Team.season_id==season_id, Player.id==player_id).first()
 
         return render_template('search_player.html', players=players, season_id=season_id, details=details)
+    
+    @app.route('/season/<int:season_id>/rank_player', methods=['GET'])
+    def view_player_rank(season_id):
+        season = Season.query.get_or_404(season_id)
+        players = Player.query.join(Team).filter(Team.season_id==season_id, Player.total_score!=0).order_by(Player.total_score.desc()).all()
+        return render_template('player_ranking.html', players=players, season=season, today=datetime.today().strftime("%d-%m-%Y"))
