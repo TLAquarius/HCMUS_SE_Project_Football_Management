@@ -59,7 +59,7 @@ def setup_team_routes(app):
                 db.session.add(new_player)
 
             db.session.commit()
-            return redirect(url_for('view_season', season_id=season_id))
+            return redirect(url_for('search_team', season_id=season_id))
 
         season = Season.query.get(season_id)
         rule = season.rule
@@ -88,14 +88,7 @@ def setup_team_routes(app):
     @app.route('/season/<int:season_id>/rank_team', methods=['GET'])
     def view_team_rank(season_id):
         season = Season.query.get_or_404(season_id)
-        teams = Team.query.filter_by(season_id=season_id).all()
-        # Get ranking information for each team
-        team_rankings = []
-        for team in teams:
-            team_ranking = TeamRanking.query.filter_by(team_id=team.id).first()
-            if team_ranking:
-                team_rankings.append(team_ranking)
-        team_rankings.sort(key=lambda x: (x.ranking), reverse=False)
+        team_rankings = TeamRanking.query.join(Team).filter(Team.season_id == season_id).order_by(TeamRanking.ranking).all()
         return render_template('team_ranking.html', season=season, team_rankings=team_rankings, today=datetime.today().strftime("%d-%m-%Y"))
     
     @app.route('/season/<int:season_id>/team/<int:team_id>/view_team', methods=['GET'])

@@ -42,6 +42,5 @@ def setup_rule_routes(app):
             db.session.add(new_rule)
             db.session.commit()
 
-            return redirect(url_for('home'))
         rule = Rule.query.order_by(Rule.id.desc()).first() or Rule()
         return render_template('rule_change.html', rule=rule)
