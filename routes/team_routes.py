@@ -64,7 +64,7 @@ def setup_team_routes(app):
         season = Season.query.get(season_id)
         rule = season.rule
         match_result = Match.query.join(Team, Match.host_team_id == Team.id) \
-            .filter(Team.season_id == season_id, Match.host_score != None, Match.guest_score != None)
+            .filter(Team.season_id == season_id, Match.host_score != None, Match.guest_score != None).all()
 
         return render_template('team_register.html',
                                match_result = match_result,
