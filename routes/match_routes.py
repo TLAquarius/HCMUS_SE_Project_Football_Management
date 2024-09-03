@@ -134,7 +134,6 @@ def setup_match_routes(app):
             match_teams.add(match.host_team_id)
             match_teams.add(match.guest_team_id)
 
-            # Step 4: Update players' total scores
             player_ids_with_scores = {result['player_id'] for result in results}
             for player_id in player_ids_with_scores:
                 player = Player.query.get(player_id)
@@ -147,15 +146,21 @@ def setup_match_routes(app):
                 if not team_ranking:
                     TeamRanking.insert_default_value(team_id[0])
 
-            # Step 5: Update team rankings
+            # Step 4: Update team rankings and player score
             for team_id in match_teams:
                 team_ranking = TeamRanking.query.get(team_id)
+                players = Player.query.filter_by(team_id=team_id).all()
+
+                for player in players:
+                    player.update_total_score()
+
                 if not team_ranking:
                     TeamRanking.insert_default_value(team_id)
                     team_ranking = TeamRanking.query.get(team_id)
                 team_ranking.update_score()
                 team_ranking.update_total_goals()
                 team_ranking.update_points()
+
             TeamRanking.update_rankings(season_id)
 
 

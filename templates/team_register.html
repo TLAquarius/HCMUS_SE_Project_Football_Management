@@ -198,12 +198,12 @@
         }
 
         if (playerRows.length > maxPlayers) {
-            alert('Số lượng cầu thủ trong đội vượt quá quy định.');
+            alert(`Số lượng cầu thủ trong đội vượt quá quy định. (Tối đa ${maxPlayers})`);
             isValid = false;
         }
 
         if (playerRows.length < minPlayers && playerRows.length !== 0) {
-            alert('Số lượng cầu thủ trong đội chưa đủ so với quy định.');
+            alert(`Số lượng cầu thủ trong đội chưa đủ so với quy định. (Tối thiểu ${minPlayers})`);
             isValid = false;
         }
 
@@ -316,7 +316,7 @@
 
         const currentForeignPlayers = Array.from(document.querySelectorAll('#playerListTable tbody tr td:nth-child(4)')).filter(td => td.textContent.trim() === 'Nước ngoài').length;
         if (playerType.value === 'Nước ngoài' && currentForeignPlayers >= maxForeignPlayers) {
-            alert('Số lượng cầu thủ nước ngoài vượt quá quy định.');
+            alert(`Số lượng cầu thủ nước ngoài vượt quá quy định. (Tối đa ${maxForeignPlayers})`);
             return;
         }
 
@@ -331,11 +331,11 @@
         }
         // Validate age
         if (age < minAge || age > maxAge) {
-            if (age > minAge){
-                alert('Độ tuổi cầu thủ vượt quá quy định.');
+            if (age > maxAge){
+                alert(`Độ tuổi cầu thủ vượt quá quy định. (Tối đa ${maxAge})`);
             }
             if (age < minAge){
-                alert('Độ tuổi cầu thủ chưa đủ so với quy định.');
+                alert(`Độ tuổi cầu thủ chưa đủ so với quy định. (Tối thiểu ${minAge})`);
             }
             return;
         }
