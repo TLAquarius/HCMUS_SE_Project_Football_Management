@@ -8,9 +8,9 @@
 <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Quay lại</button>
 {% endblock %}
 {% block content %}
-    <div class="main-content">
+    <div class="main-content" style="margin-left: 20px;">
         <form class="form-inline" method="GET">
-            <input type="text" class="form-control mr-sm-2" name="search" placeholder="Nhập tên cầu thủ...">
+            <input type="text" style="width: 500px;" class="form-control mr-sm-2" name="search" placeholder="Nhập tên cầu thủ...">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
         </form>
         <div class="player-table">
@@ -18,31 +18,31 @@
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th style="width: 400px;">Cầu Thủ</th>
-                        <th style="width: 400px;">Đội</th>
-                        <th>Loại Cầu Thủ</th>
-                        <th>Tổng Số Bàn Thắng</th>
+                        <th style="width: 400px; align-items: center;">Cầu Thủ</th>
+                        <th style="width: 400px; align-items: center;">Đội</th>
+                        <th style="width: 400px; align-items: center;">Loại Cầu Thủ</th>
+                        <th style="width: 400px; align-items: center;">Tổng Số Bàn Thắng</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for player in players %}
                     <tr onclick="window.location.href='{{ url_for('search_player', season_id=season_id, player_id=player.id) }}'">
-                        <td>{{ loop.index }}</td>
-                        <td>{{ player.name }}</td>
-                        <td>{{ player.team.name }}</td>
-                        <td>{{ player.player_type }}</td>
-                        <td>{{ player.total_score }}</td>
+                        <td style="align-items: center;">{{ loop.index }}</td>
+                        <td style="align-items: center;">{{ player.name }}</td>
+                        <td style="align-items: center;">{{ player.team.name }}</td>
+                        <td style="align-items: center;">{{ player.player_type }}</td>
+                        <td style="align-items: center;">{{ player.total_score }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% if details %}
-        <div class="card-header">
+        <b><div class="card-header" style="border: 2px solid black; background-color: gray; font-size: 20px;">
             Thông tin cầu thủ
-        </div>
-        <div class="card-body">
+        </div></b>
+        <div class="card-body" style="border: 2px solid black; border-top: 0px;">
             <div class="player-details" id="player-details">
                 <div class="row">
                     <div class="col-md-4">
@@ -51,10 +51,10 @@
                         {% endif %}
                     </div>
                     <div class="col-md-8">
-                        <h3>{{ details.name }}</h3>
-                        <p><strong>Đội tuyển: {{ details.team.name }}</strong></p>
-                        <p><strong>Loại cầu thủ: {{ details.player_type }}</strong></p>
-                        <p><strong>Ngày sinh: {{ details.birthday }}</strong></p>
+                        <h3 style="font-size: 40px;">{{ details.name }}</h3>
+                        <p style="font-size: 25px;"><strong>Đội tuyển: {{ details.team.name }}</strong></p>
+                        <p style="font-size: 25px;"><strong>Loại cầu thủ: {{ details.player_type }}</strong></p>
+                        <p style="font-size: 25px;"><strong>Ngày sinh: {{ details.birthday }}</strong></p>
                     </div>
                 </div>
             </div>
