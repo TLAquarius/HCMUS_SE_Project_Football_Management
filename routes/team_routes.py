@@ -59,7 +59,7 @@ def setup_team_routes(app):
                 db.session.add(new_player)
 
             db.session.commit()
-            return redirect(url_for('view_season', season_id=season_id))
+            return redirect(url_for('search_team', season_id=season_id))
 
         season = Season.query.get(season_id)
         rule = season.rule

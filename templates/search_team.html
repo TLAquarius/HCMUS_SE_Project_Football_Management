@@ -4,6 +4,7 @@
 
 {% block sidebar %}
 <button class="btn btn-secondary btn-block" onclick="window.location.href='/'">Trang chủ</button>
+<button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('register_team', season_id=season.id) }}'">Đăng ký tham gia giải</button>
 <button class="btn btn-secondary btn-block" onclick="window.location.href='{{ url_for('view_season', season_id=season_id) }}'">Quay lại</button>
 {% endblock %}
 
